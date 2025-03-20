@@ -1,0 +1,15 @@
+body {
+    background: linear-gradient(to bottom, #4a90e2, #8e44ad);
+    color: white;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+}
+
+pre {
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
