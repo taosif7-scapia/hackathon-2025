@@ -35,7 +35,7 @@ function addShimmerChips() {
 function addBudgetShimmerChips() {
     const container = document.getElementById('budgetSuggestions');
     if (!container) return;
-    
+
     container.innerHTML = `
         <div class="budget-options">
             ${Array(3).fill(0).map(() => `
@@ -250,7 +250,7 @@ function prevStep() {
 // Modify the addChip function to be globally accessible
 function addChip(value) {
     if (!value.trim()) return;
-    
+
     const chipsContainer = document.getElementById('preferencesChips');
     const chipInput = document.getElementById('chipInput');
     const hiddenInput = document.getElementById('preferences');
@@ -315,7 +315,7 @@ document.getElementById("travelForm").addEventListener("submit", async function 
     console.log("Submitting:", formData);
 
     // Get hero image for the destination
-    const imageResponse = await fetch(`https://www.googleapis.com/customsearch/v1?key=AIzaSyDaQL3QVmYWjNVg1_XA8V0dKpC5X9qysI0&cx=4240c891e0cad4fa3&searchType=image&q=${encodeURIComponent(formData.destination+ ' wallpaper cover image HD')}`);
+    const imageResponse = await fetch(`https://www.googleapis.com/customsearch/v1?key=AIzaSyDaQL3QVmYWjNVg1_XA8V0dKpC5X9qysI0&cx=4240c891e0cad4fa3&searchType=image&q=${encodeURIComponent(formData.destination + ' wallpaper cover image HD')}`);
     const imageData = await imageResponse.json();
     const heroImage = imageData.items?.[0]?.link || '';
 
@@ -334,6 +334,7 @@ Transform this input into a comprehensive travel itinerary following this struct
 
 {
 "tripDetails": {
+"source":"Bangalore, India -- Always fixed",
 "destination": "Primary Destination",
 "regions": ["Region/City 1", "Region/City 2"],
 "tripName": "Custom Trip Name (evocative and personalized)",
@@ -462,7 +463,8 @@ Families: Kid-friendly activities, downtime, practical needs.
 Luxury Travelers: Exclusive experiences, VIP access, premium services.
 Budget Travelers: Free/low-cost activities, money-saving strategies.
 Adventure Seekers: Active experiences, difficulty levels, recovery time.
-Cultural Enthusiasts: Historical sites, immersive experiences, guided tours.`
+Cultural Enthusiasts: Historical sites, immersive experiences, guided tours.
+Please output atleast 3 key experiences, daily itinerary items to match with number of travel da, and 6 practical info items.`
         },
         {
             role: "user",
@@ -491,7 +493,7 @@ Cultural Enthusiasts: Historical sites, immersive experiences, guided tours.`
         const result = await response.json();
         let tripData = JSON.parse(result['choices'][0]['message']['content']);
         tripData['tripDetails']['heroImage'] = heroImage;
-        
+
         // Post to API instead of localStorage
         try {
             const apiResponse = await fetch('https://3o9fqxdqy6.execute-api.ap-south-1.amazonaws.com/api/itinerary/save', {
@@ -502,7 +504,7 @@ Cultural Enthusiasts: Historical sites, immersive experiences, guided tours.`
                 },
                 body: JSON.stringify(tripData)
             });
-            
+
             const apiResult = await apiResponse.json();
             clearInterval(loaderInterval);
             window.location.href = `/trip-details.html?id=${apiResult.itineraryId}`;
