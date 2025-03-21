@@ -3,108 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trip Details</title>
+    <title>TripMaster | Your Journey Awaits</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #006C9A;
+            --primary-light: rgba(0, 108, 154, 0.1);
+            --primary-dark: #005a80;
             --secondary: #FF8D3F;
+            --secondary-light: rgba(255, 141, 63, 0.15);
             --accent: #E84855;
             --light: #f8f9fa;
             --dark: #1A2E35;
+            --gray-100: #f5f5f5;
+            --gray-200: #e9e9e9;
+            --gray-300: #d4d4d4;
+            --gray-800: #333333;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Source Sans 3', sans-serif;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.1);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            --transition: all 0.3s ease;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
             background-color: var(--light);
             color: var(--dark);
             line-height: 1.6;
+            font-family: var(--font-body);
             font-size: 16px;
-            padding: 20px;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5 {
+            font-family: var(--font-heading);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
         }
         
         .container {
-            max-width: 1000px;
+            width: 100%;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
         }
         
         .header {
             background-color: var(--primary);
             color: white;
-            padding: 40px 20px;
+            padding: 0;
+            margin-bottom: 40px;
+            position: relative;
+            height: 70vh;
+            min-height: 500px;
+            max-height: 700px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            background-image: linear-gradient(rgba(0, 108, 154, 0.7), rgba(0, 108, 154, 0.7)), url('https://assets.vogue.com/photos/677ec42ad09dd248a648fa95/master/w_2560%2Cc_limit/CW_Drone_20.2.20DJI_0062.jpg');
+            overflow: hidden;
+        }
+        
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.3) 0%,
+                rgba(0, 0, 0, 0.5) 100%
+            );
+            z-index: 1;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-size: cover;
             background-position: center;
+            transform: scale(1.05);
+            transition: transform 10s ease;
+            z-index: 0;
+        }
+        
+        .page-loaded .header-bg {
+            transform: scale(1);
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
         }
         
         .header h1 {
-            font-size: 3rem;
+            font-size: 4.5rem;
+            font-weight: 900;
             margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease forwards 0.2s;
         }
         
         .header h2 {
-            font-size: 1.5rem;
-            font-weight: 300;
+            font-size: 1.8rem;
+            font-weight: 400;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease forwards 0.4s;
         }
         
-        .header p {
-            margin-top: 10px;
+        .header-dates {
             font-weight: 600;
-            color: var(--secondary);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease forwards 0.6s;
+            background-color: var(--secondary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            display: inline-block;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
         .weather-widget {
             background-color: rgba(255, 255, 255, 0.2);
-            margin-top: 15px;
-            padding: 8px 15px;
-            border-radius: 5px;
+            backdrop-filter: blur(10px);
+            margin-top: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
             display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease forwards 0.8s;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .weather-item {
             display: inline-block;
-            margin: 0 8px;
-            font-size: 0.9rem;
+            margin: 0 15px;
+            font-size: 1rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
-        .intro {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .weather-item i {
+            margin-right: 8px;
         }
         
-        .intro h2 {
+        /* Page sections */
+        .section {
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .page-section {
+            padding: 40px 0;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
             color: var(--primary);
-            margin-bottom: 10px;
-            font-size: 1.8rem;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
         }
         
-        .intro p {
-            margin-bottom: 10px;
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background-color: var(--secondary);
+        }
+        
+        /* Overview */
+        .overview {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .overview-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 5px;
+            width: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        
+        .overview h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .overview p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: var(--gray-800);
+            line-height: 1.7;
         }
         
         .highlights {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 15px;
+            margin-top: 30px;
         }
         
         .highlight {
-            background-color: var(--light);
-            padding: 10px 15px;
-            border-radius: 5px;
+            background-color: var(--primary-light);
+            padding: 12px 20px;
+            border-radius: 30px;
             display: flex;
             align-items: center;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        
+        .highlight:hover {
+            background-color: white;
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-sm);
         }
         
         .highlight-icon {
@@ -112,290 +273,426 @@
             font-size: 1.2rem;
         }
         
-        .day-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+        /* Day Cards */
+        .day-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }
         
-        .day-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+        .day-card {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .day-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+        }
+        
+        .day-header {
+            padding: 30px;
+            position: relative;
+            border-bottom: 1px solid var(--gray-200);
         }
         
         .day-number {
-            background-color: var(--primary);
+            background-color: var(--secondary);
             color: white;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            box-shadow: var(--shadow-md);
+            font-family: var(--font-heading);
+        }
+        
+        .day-title {
+            margin-right: 80px;
         }
         
         .day-title h3 {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: var(--primary);
+            margin-bottom: 10px;
         }
         
         .location {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
             font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--gray-800);
         }
         
-        .location:before {
-            content: '📍';
-            margin-right: 5px;
+        .location i {
+            color: var(--accent);
+            margin-right: 10px;
         }
         
         .location a {
-            margin-left: 10px;
+            margin-left: 15px;
             color: var(--primary);
             text-decoration: none;
             font-size: 0.9rem;
+            border-bottom: 1px dashed var(--primary);
+            transition: var(--transition);
         }
         
         .location a:hover {
-            text-decoration: underline;
+            color: var(--primary-dark);
+        }
+        
+        .day-content {
+            padding: 30px;
         }
         
         .commute-info {
-            background-color: #f5f5f5;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
+            background-color: var(--gray-100);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 1rem;
             display: flex;
             align-items: center;
+            border-left: 4px solid var(--primary);
         }
         
-        .commute-info:before {
-            content: '🚗';
-            margin-right: 8px;
-            font-size: 1.1rem;
+        .commute-info i {
+            margin-right: 12px;
+            color: var(--primary);
+            font-size: 1.2rem;
         }
         
         .activity-list {
             list-style-type: none;
-            margin: 15px 0;
+            margin: 25px 0;
         }
         
         .activity-list li {
-            padding: 8px 0;
+            padding: 12px 0;
             padding-left: 25px;
             position: relative;
+            font-size: 1.05rem;
+            border-bottom: 1px dashed var(--gray-200);
+        }
+        
+        .activity-list li:last-child {
+            border-bottom: none;
         }
         
         .activity-list li:before {
-            content: '•';
+            content: '';
             position: absolute;
-            left: 10px;
-            color: var(--secondary);
+            left: 0;
+            top: 18px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--secondary);
+            border-radius: 50%;
         }
         
         .special-box {
-            background-color: rgba(255, 141, 63, 0.1);
-            border-left: 3px solid var(--secondary);
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 0 5px 5px 0;
+            background-color: var(--secondary-light);
+            border-left: 4px solid var(--secondary);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
         }
         
         .special-title {
             font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--secondary);
+            margin-bottom: 10px;
+            color: var(--dark);
             display: flex;
             align-items: center;
+            font-size: 1.2rem;
         }
         
-        .special-title:before {
-            content: attr(data-icon);
-            margin-right: 8px;
+        .special-title i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        
+        /* Accommodation */
+        .day-section-title {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin: 30px 0 20px;
+            font-family: var(--font-heading);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .day-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--secondary);
         }
         
         .stay-options {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            margin: 15px 0;
+            gap: 20px;
+            margin: 25px 0;
         }
         
         .stay-option {
             flex: 1 1 calc(50% - 10px);
-            min-width: 250px;
-            background-color: var(--light);
-            padding: 15px;
-            border-radius: 5px;
+            min-width: 280px;
+            background-color: var(--gray-100);
+            padding: 25px;
+            border-radius: 12px;
             position: relative;
+            transition: var(--transition);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .stay-option:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            background-color: white;
         }
         
         .option-label {
             position: absolute;
-            top: -10px;
-            right: 10px;
+            top: -12px;
+            right: 20px;
             background-color: var(--secondary);
             color: white;
-            padding: 3px 10px;
+            padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .stay-option h4 {
             color: var(--primary);
-            margin-bottom: 5px;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .stay-option p {
+            margin-bottom: 15px;
+            color: var(--gray-800);
+        }
+        
+        .tags-container {
+            margin-top: 15px;
         }
         
         .tag {
             display: inline-block;
-            background-color: #eee;
-            padding: 5px 10px;
+            background-color: white;
+            padding: 6px 12px;
             border-radius: 20px;
-            margin-right: 5px;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
         }
         
         .tag.blue {
-            background-color: rgba(0, 108, 154, 0.2);
+            background-color: rgba(0, 108, 154, 0.1);
             color: var(--primary);
         }
         
         .tag.orange {
-            background-color: rgba(255, 141, 63, 0.2);
+            background-color: rgba(255, 141, 63, 0.1);
             color: #d67321;
         }
         
         .tag.green {
-            background-color: rgba(40, 167, 69, 0.2);
+            background-color: rgba(40, 167, 69, 0.1);
             color: #28a745;
         }
         
         .tag.red {
-            background-color: rgba(232, 72, 85, 0.2);
+            background-color: rgba(232, 72, 85, 0.1);
             color: var(--accent);
         }
         
-        .section-title {
-            font-size: 1.8rem;
-            color: var(--primary);
-            margin: 30px 0 15px;
+        .tag:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Key Experiences */
+        .experiences-section {
+            padding: 60px 0;
+            background-color: var(--primary-light);
+            margin: 60px 0;
         }
         
         .experience-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
         }
         
         .experience-card {
             background-color: white;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            height: 100%;
+        }
+        
+        .experience-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
         }
         
         .card-header {
             background-color: var(--primary);
             color: white;
-            padding: 15px;
+            padding: 25px;
             position: relative;
         }
         
         .card-header h3 {
-            margin-right: 40px;
+            margin-right: 50px;
+            font-size: 1.5rem;
         }
         
         .exp-icon {
             position: absolute;
-            right: 15px;
+            right: 20px;
             top: 50%;
             transform: translateY(-50%);
             background-color: white;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--primary);
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
         }
         
         .card-content {
-            padding: 15px;
+            padding: 25px;
+        }
+        
+        .card-content p {
+            color: var(--gray-800);
+            margin-bottom: 20px;
+            line-height: 1.7;
         }
         
         .detail-list {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed #eee;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--gray-300);
         }
         
         .detail-item {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             display: flex;
+            align-items: flex-start;
+        }
+        
+        .detail-item:last-child {
+            margin-bottom: 0;
         }
         
         .detail-icon {
-            margin-right: 8px;
+            margin-right: 12px;
             color: var(--secondary);
+            flex-shrink: 0;
+            margin-top: 3px;
         }
         
+        .detail-content {
+            flex: 1;
+        }
+        
+        .detail-type {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--dark);
+        }
+        
+        /* Tips Section */
         .tips-section {
             background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 30px 0;
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            margin: 60px 0;
+            box-shadow: var(--shadow-md);
+            position: relative;
         }
         
         .tips-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
         }
         
         .tip-card {
-            border: 1px solid #eee;
-            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
             overflow: hidden;
+            transition: var(--transition);
+            height: 100%;
+        }
+        
+        .tip-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--gray-300);
         }
         
         .tip-header {
-            padding: 10px 15px;
-            background-color: var(--light);
+            padding: 15px 20px;
+            background-color: var(--gray-100);
             font-weight: 600;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 1.1rem;
+            color: var(--primary);
         }
         
         .tip-icon {
-            margin-right: 10px;
+            margin-right: 12px;
+            color: var(--secondary);
         }
         
         .tip-content {
-            padding: 15px;
+            padding: 20px;
+        }
+        
+        .tip-list {
+            list-style-type: none;
         }
         
         .tip-list li {
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px dashed #eee;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--gray-200);
             display: flex;
+            align-items: flex-start;
         }
         
         .tip-list li:last-child {
@@ -405,198 +702,1144 @@
         }
         
         .tip-marker {
-            margin-right: 8px;
+            margin-right: 12px;
             color: var(--secondary);
+            flex-shrink: 0;
+            margin-top: 3px;
         }
         
+        /* Map section */
+        .map-section {
+            margin: 60px 0;
+            position: relative;
+        }
+        
+        .map-container {
+            height: 500px;
+            background-color: var(--gray-100);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .map-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--gray-800);
+        }
+        
+        /* Footer */
         .footer {
             background-color: var(--dark);
             color: white;
-            padding: 30px 20px;
+            padding: 60px 20px;
             text-align: center;
-            border-radius: 8px;
-            margin-top: 40px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            margin-top: 80px;
         }
         
         .footer h2 {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
         }
         
         .footer p {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             opacity: 0.8;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .footer-stamp {
             display: inline-block;
             border: 1px dashed rgba(255,255,255,0.3);
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 12px 25px;
+            border-radius: var(--radius-md);
+            font-family: var(--font-heading);
+            color: var(--secondary);
         }
         
-        @media (max-width: 600px) {
-            .day-title {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+        /* Utility classes */
+        .price-range {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .text-secondary {
+            color: var(--secondary);
+        }
+        
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .badge-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .badge-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        /* Animations */
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .header h1 {
+                font-size: 3.5rem;
+            }
+            
+            .header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .overview {
+                padding: 30px;
+            }
+            
+            .experience-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                height: 60vh;
+            }
+            
+            .header h1 {
+                font-size: 2.8rem;
+            }
+            
+            .header h2 {
+                font-size: 1.3rem;
             }
             
             .stay-option {
                 flex: 1 1 100%;
             }
             
-            .experience-grid, .tips-grid {
+            .day-header, .day-content {
+                padding: 20px;
+            }
+            
+            .day-number {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                top: 20px;
+                right: 20px;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .tips-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .map-container {
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header {
+                min-height: 400px;
+            }
+            
+            .header h1 {
+                font-size: 2.3rem;
+            }
+            
+            .header-dates {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+            
+            .weather-widget {
+                padding: 10px 15px;
+            }
+            
+            .weather-item {
+                margin: 0 8px;
+                font-size: 0.9rem;
+            }
+            
+            .overview {
+                padding: 25px 20px;
+            }
+            
+            .overview h2 {
+                font-size: 1.8rem;
+            }
+            
+            .day-title h3 {
+                font-size: 1.6rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .experience-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container {
+                height: 300px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 id="destinationTitle"></h1>
-            <h2 id="tripName"></h2>
-            <p id="tripDates"></p>
-            <div class="weather-widget" id="weatherWidget"></div>
+    <div class="header">
+        <div class="header-bg" id="headerBg"></div>
+        <div class="header-overlay"></div>
+        <div class="header-content">
+            <h1 id="destinationTitle">Bali Paradise</h1>
+            <h2 id="tripName">Island Adventure & Cultural Immersion</h2>
+            <div class="header-dates" id="tripDates">April 15 - 28, 2025</div>
+            <div class="weather-widget" id="weatherWidget">
+                <div class="weather-item"><i class="fa-solid fa-temperature-half"></i> 24-32°C</div>
+                <div class="weather-item"><i class="fa-solid fa-cloud-sun"></i> Mostly Sunny</div>
+                <div class="weather-item"><i class="fa-solid fa-droplet"></i> 70% Humidity</div>
+            </div>
         </div>
-
-        <div class="intro" id="overview"></div>
-        <div id="dailyItinerary"></div>
-        <h2 class="section-title">Key Experiences</h2>
-        <div class="experience-grid" id="keyExperiences"></div>
-        <div class="tips-section" id="practicalInfo"></div>
     </div>
 
+    <div class="container">
+        <div class="overview section" id="overview">
+            <div class="overview-line"></div>
+            <h2>Trip Overview</h2>
+            <p>Immerse yourself in the exotic paradise of Bali, where ancient temples meet pristine beaches and lush jungles. This carefully crafted two-week journey balances relaxation with adventure, cultural experiences with natural wonders, and traditional Balinese hospitality with modern comforts.</p>
+            <p>From the spiritual heart of Ubud to the surf-friendly shores of Canggu and the dramatic cliff-top views of Uluwatu, this itinerary showcases the diverse landscapes and rich cultural tapestry that make Bali one of the world's most beloved destinations.</p>
+            <div class="highlights">
+                <div class="highlight"><span class="highlight-icon">🌊</span> Pristine beaches</div>
+                <div class="highlight"><span class="highlight-icon">🏞️</span> Rice terraces</div>
+                <div class="highlight"><span class="highlight-icon">🛕</span> Ancient temples</div>
+                <div class="highlight"><span class="highlight-icon">🧘‍♀️</span> Yoga retreats</div>
+                <div class="highlight"><span class="highlight-icon">🌋</span> Volcano trekking</div>
+                <div class="highlight"><span class="highlight-icon">🏄‍♂️</span> World-class surfing</div>
+            </div>
+        </div>
+
+        <div class="day-cards section" id="dailyItinerary">
+            <h2 class="section-title">Daily Itinerary</h2>
+            
+            <!-- Day 1 -->
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">1</div>
+                    <div class="day-title">
+                        <h3>Arrival in Paradise</h3>
+                        <div class="location"><i class="fa-solid fa-location-dot"></i> Seminyak, Bali <a href="#" target="_blank">View on map</a></div>
+                    </div>
+                </div>
+                <div class="day-content">
+                    <div class="commute-info"><i class="fa-solid fa-car"></i> Private airport transfer (30 minutes, 12 km)</div>
+                    
+                    <p>Welcome to the Island of the Gods! After your arrival at Ngurah Rai International Airport, a private driver will whisk you away to your accommodations in stylish Seminyak. The remainder of the day is designed for relaxation as you ease into Bali time and recover from your journey.</p>
+                    
+                    <ul class="activity-list">
+                        <li>Arrive at Ngurah Rai International Airport</li>
+                        <li>Private transfer to your accommodation in Seminyak</li>
+                        <li>Check-in and refresh after your journey</li>
+                        <li>Evening sunset stroll along Seminyak Beach</li>
+                        <li>Welcome dinner at a beachfront restaurant</li>
+                    </ul>
+                    
+                    <div class="special-box">
+                        <div class="special-title"><i class="fa-solid fa-star"></i> Special Experience</div>
+                        <p>End your first day with a magical sunset dinner at La Lucciola, where you'll dine with your toes in the sand while watching the sun dip below the horizon, painting the sky in vibrant hues of orange and pink – the perfect introduction to Bali's legendary sunsets.</p>
+                    </div>
+                    
+                    <h4 class="day-section-title">Where to Stay</h4>
+                    <div class="stay-options">
+                        <div class="stay-option">
+                            <div class="option-label">Luxury</div>
+                            <h4>W Bali - Seminyak</h4>
+                            <p>Ultra-stylish beachfront resort featuring bold design, stunning infinity pools, and world-class dining.</p>
+                            <div class="price-range">$350-450/night</div>
+                            <div class="tags-container">
+                                <span class="tag blue">Beachfront</span>
+                                <span class="tag orange">Pool Villa</span>
+                                <span class="tag green">Spa</span>
+                            </div>
+                        </div>
+                        <div class="stay-option">
+                            <div class="option-label">Mid-Range</div>
+                            <h4>The Colony Hotel</h4>
+                            <p>Boutique colonial-style hotel with elegant rooms surrounding a central pool, walking distance to beach and restaurants.</p>
+                            <div class="price-range">$120-180/night</div>
+                            <div class="tags-container">
+                                <span class="tag blue">Central Location</span>
+                                <span class="tag green">Breakfast Included</span>
+                                <span class="tag orange">Colonial Charm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Day 2 -->
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">2</div>
+                    <div class="day-title">
+                        <h3>Beach Life & Shopping</h3>
+                        <div class="location"><i class="fa-solid fa-location-dot"></i> Seminyak, Bali <a href="#" target="_blank">View on map</a></div>
+                    </div>
+                </div>
+                <div class="day-content">
+                    <p>Today is all about embracing Seminyak's laid-back beach lifestyle and vibrant shopping scene. After breakfast, head to the famous beach clubs, explore the stylish boutiques, and indulge in Seminyak's renowned culinary offerings.</p>
+                    
+                    <ul class="activity-list">
+                        <li>Morning yoga session on the beach (optional)</li>
+                        <li>Leisurely breakfast at your accommodation</li>
+                        <li>Beach time at Seminyak Beach</li>
+                        <li>Lunch at a trendy beach club</li>
+                        <li>Afternoon shopping on Jalan Kayu Aya (Eat Street)</li>
+                        <li>Sunset cocktails at Potato Head Beach Club</li>
+                        <li>Dinner at one of Seminyak's acclaimed restaurants</li>
+                    </ul>
+                    
+                    <div class="special-box">
+                        <div class="special-title"><i class="fa-solid fa-star"></i> Local Insight</div>
+                        <p>For the best shopping experience, venture beyond the main streets to find hidden boutiques showcasing work from local designers. Jalan Raya Seminyak and the side streets off Jalan Kayu Aya offer unique finds that you won't see back home.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="experiences-section">
+        <div class="container">
+            <h2 class="section-title">Key Experiences</h2>
+            <div class="experience-grid" id="keyExperiences">
+                <!-- Experience 1 -->
+                <div class="experience-card">
+                    <div class="card-header">
+                        <h3>Sacred Monkey Forest</h3>
+                        <div class="exp-icon">🐒</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Walk through this enchanting forest sanctuary home to over 700 Balinese long-tailed macaques. The forest contains ancient temples and is considered a sacred spiritual center by locals.</p>
+                        <div class="detail-list">
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-regular fa-clock"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Best Time</div>
+                                    <div>Early morning (8-10am) or late afternoon (3-5pm)</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Duration</div>
+                                    <div>1-2 hours</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Cost</div>
+                                    <div>80,000 IDR (~$5 USD) per adult</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Tips</div>
+                                    <div>Don't bring food or plastic bags. Remove sunglasses and dangling jewelry. Don't stare directly at monkeys as they may perceive it as a challenge.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Experience 2 -->
+                <div class="experience-card">
+                    <div class="card-header">
+                        <h3>Mount Batur Sunrise Hike</h3>
+                        <div class="exp-icon">🌋</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Embark on an early morning trek up an active volcano to witness one of Bali's most magical experiences - sunrise from the summit of Mount Batur, with panoramic views across Lake Batur and neighboring Mount Agung.</p>
+                        <div class="detail-list">
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-regular fa-clock"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Best Time</div>
+                                    <div>Start at 2:30am to reach summit by sunrise (5:45-6:15am)</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Duration</div>
+                                    <div>6-7 hours (2-3 hours up, 1.5-2 hours down, plus time at summit)</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Cost</div>
+                                    <div>500,000-700,000 IDR (~$35-45 USD) per person</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Tips</div>
+                                    <div>Wear layers (it's cold before sunrise), sturdy shoes, and bring a headlamp. The trek is moderate difficulty but achievable for most fitness levels.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Experience 3 -->
+                <div class="experience-card">
+                    <div class="card-header">
+                        <h3>Traditional Balinese Cooking Class</h3>
+                        <div class="exp-icon">🍲</div>
+                    </div>
+                    <div class="card-content">
+                        <p>Learn the secrets of authentic Balinese cuisine in this hands-on culinary adventure. Visit local markets to select fresh ingredients, then prepare traditional dishes under the guidance of expert local chefs.</p>
+                        <div class="detail-list">
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-regular fa-clock"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Best Time</div>
+                                    <div>Morning classes (8am-1pm) include market visits</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Duration</div>
+                                    <div>4-6 hours</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Cost</div>
+                                    <div>400,000-600,000 IDR (~$25-40 USD) per person</div>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-icon"><i class="fa-solid fa-bookmark"></i></div>
+                                <div class="detail-content">
+                                    <div class="detail-type">Booking</div>
+                                    <div>Reserve 1-2 days in advance, especially in high season</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="map-section section">
+            <h2 class="section-title">Trip Map</h2>
+            <div class="map-container">
+                <div class="map-placeholder">Interactive trip map will be displayed here</div>
+            </div>
+        </div>
+        
+        <div class="tips-section section" id="practicalInfo">
+            <h2 class="section-title">Practical Information</h2>
+            <div class="tips-grid">
+                <!-- Tip Card 1 -->
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <div class="tip-icon"><i class="fa-solid fa-plane-departure"></i></div>
+                        Transportation
+                    </div>
+                    <div class="tip-content">
+                        <ul class="tip-list">
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Private drivers are the most comfortable option for longer journeys (400-600k IDR/day).</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Ride-hailing apps (Gojek, Grab) work well in tourist areas but are banned in some locations.</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Scooter rentals cost 60-80k IDR/day, but require international driving permit and experience.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Tip Card 2 -->
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <div class="tip-icon"><i class="fa-solid fa-suitcase"></i></div>
+                        Packing Essentials
+                    </div>
+                    <div class="tip-content">
+                        <ul class="tip-list">
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Light, breathable clothing (cotton or linen)</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Modest clothing for temple visits (shoulders and knees covered)</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>High SPF sunscreen, insect repellent, and rain jacket/umbrella</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Portable water bottle with filter (tap water isn't potable)</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Tip Card 3 -->
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <div class="tip-icon"><i class="fa-solid fa-wallet"></i></div>
+                        Money Matters
+                    </div>
+                    <div class="tip-content">
+                        <ul class="tip-list">
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>ATMs widely available in tourist areas (daily withdrawal limit usually 2-3 million IDR)</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Credit cards accepted at upscale establishments but carry cash for smaller vendors</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Tipping not required but appreciated (10% for good service)</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Tip Card 4 -->
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <div class="tip-icon"><i class="fa-solid fa-wifi"></i></div>
+                        Connectivity
+                    </div>
+                    <div class="tip-content">
+                        <ul class="tip-list">
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Local SIM cards available at airport (Telkomsel recommended for coverage)</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Most accommodations and cafes offer free WiFi</div>
+                            </li>
+                            <li>
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>Download Gojek, WhatsApp, and Maps.me for offline navigation</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="container">
+            <h2>Your Bali Adventure Awaits</h2>
+            <p>This itinerary was created especially for you by TripMaster. Feel free to customize it to your preferences and share it with your travel companions.</p>
+            <div class="footer-stamp">Created with ♥ by TripMaster</div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/123abc123a.js" crossorigin="anonymous"></script>
     <script>
-        function getCookie(name) {
-            let cookieArr = document.cookie.split(";");
-            for (let i = 0; i < cookieArr.length; i++) {
-                let cookiePair = cookieArr[i].split("=");
-                if (name == cookiePair[0].trim()) {
-                    return decodeURIComponent(cookiePair[1]);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set header background
+            document.getElementById('headerBg').style.backgroundImage = "url('https://assets.vogue.com/photos/677ec42ad09dd248a648fa95/master/w_2560%2Cc_limit/CW_Drone_20.2.20DJI_0062.jpg')";
+            
+            // Add page loaded class for animations
+            setTimeout(function() {
+                document.body.classList.add('page-loaded');
+            }, 100);
+            
+            // Function to check if an element is in viewport
+            function isInViewport(element) {
+                const rect = element.getBoundingClientRect();
+                return (
+                    rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85
+                );
+            }
+            
+            // Intersection Observer for section animations
+            const sections = document.querySelectorAll('.section');
+            
+            function checkSections() {
+                sections.forEach(section => {
+                    if (isInViewport(section)) {
+                        section.classList.add('visible');
+                    }
+                });
+            }
+            
+            // Check sections on load
+            checkSections();
+            
+            // Check sections on scroll
+            window.addEventListener('scroll', checkSections);
+            
+            // Demo data - this will be used if localStorage is not available
+            const demoTripData = {
+                tripDetails: {
+                    destination: "Bali, Indonesia",
+                    tripName: "Island Adventure & Cultural Immersion",
+                    startDate: "2025-04-15",
+                    endDate: "2025-04-28",
+                    duration: 14,
+                    travelers: [
+                        {name: "Alex", relationship: "You"},
+                        {name: "Jordan", relationship: "Partner"},
+                        {name: "Taylor", relationship: "Friend"},
+                        {name: "Casey", relationship: "Friend"}
+                    ],
+                    tripType: "Beach/Cultural",
+                    tripStyle: "Balanced pace with mix of relaxation and adventure"
+                },
+                overview: {
+                    description: "Immerse yourself in the exotic paradise of Bali, where ancient temples meet pristine beaches and lush jungles. This carefully crafted two-week journey balances relaxation with adventure, cultural experiences with natural wonders, and traditional Balinese hospitality with modern comforts.",
+                    weatherInfo: {
+                        seasonDescription: "Mostly Sunny",
+                        temperatureRange: "24-32°C",
+                        climateNotes: "70% Humidity",
+                        weatherConsiderations: "Brief afternoon showers possible"
+                    },
+                    keyHighlights: [
+                        "Pristine beaches",
+                        "Rice terraces",
+                        "Ancient temples",
+                        "Yoga retreats",
+                        "Volcano trekking",
+                        "World-class surfing"
+                    ]
+                },
+                dailyItinerary: [
+                    {
+                        day: 1,
+                        title: "Arrival in Paradise",
+                        location: "Seminyak, Bali",
+                        locationMapUrl: "#",
+                        transportation: {
+                            mode: "Private airport transfer",
+                            duration: "30 minutes",
+                            distance: "12 km",
+                            notes: "Air-conditioned vehicle"
+                        },
+                        description: "Welcome to the Island of the Gods! After your arrival at Ngurah Rai International Airport, a private driver will whisk you away to your accommodations in stylish Seminyak. The remainder of the day is designed for relaxation as you ease into Bali time and recover from your journey.",
+                        activities: [
+                            "Arrive at Ngurah Rai International Airport",
+                            "Private transfer to your accommodation in Seminyak",
+                            "Check-in and refresh after your journey",
+                            "Evening sunset stroll along Seminyak Beach",
+                            "Welcome dinner at a beachfront restaurant"
+                        ],
+                        specialHighlight: {
+                            title: "Special Experience",
+                            description: "End your first day with a magical sunset dinner at La Lucciola, where you'll dine with your toes in the sand while watching the sun dip below the horizon, painting the sky in vibrant hues of orange and pink – the perfect introduction to Bali's legendary sunsets."
+                        },
+                        accommodationOptions: [
+                            {
+                                name: "W Bali - Seminyak",
+                                description: "Ultra-stylish beachfront resort featuring bold design, stunning infinity pools, and world-class dining.",
+                                amenities: ["Beachfront", "Pool Villa", "Spa", "Multiple Restaurants"],
+                                priceRange: "$350-450/night",
+                                bestFor: "Luxury travelers"
+                            },
+                            {
+                                name: "The Colony Hotel",
+                                description: "Boutique colonial-style hotel with elegant rooms surrounding a central pool, walking distance to beach and restaurants.",
+                                amenities: ["Central Location", "Breakfast Included", "Colonial Charm", "Pool"],
+                                priceRange: "$120-180/night",
+                                bestFor: "Mid-range travelers"
+                            }
+                        ]
+                    },
+                    {
+                        day: 2,
+                        title: "Beach Life & Shopping",
+                        location: "Seminyak, Bali",
+                        locationMapUrl: "#",
+                        description: "Today is all about embracing Seminyak's laid-back beach lifestyle and vibrant shopping scene. After breakfast, head to the famous beach clubs, explore the stylish boutiques, and indulge in Seminyak's renowned culinary offerings.",
+                        activities: [
+                            "Morning yoga session on the beach (optional)",
+                            "Leisurely breakfast at your accommodation",
+                            "Beach time at Seminyak Beach",
+                            "Lunch at a trendy beach club",
+                            "Afternoon shopping on Jalan Kayu Aya (Eat Street)",
+                            "Sunset cocktails at Potato Head Beach Club",
+                            "Dinner at one of Seminyak's acclaimed restaurants"
+                        ],
+                        specialHighlight: {
+                            title: "Local Insight",
+                            description: "For the best shopping experience, venture beyond the main streets to find hidden boutiques showcasing work from local designers. Jalan Raya Seminyak and the side streets off Jalan Kayu Aya offer unique finds that you won't see back home."
+                        }
+                    }
+                ],
+                keyExperiences: [
+                    {
+                        title: "Sacred Monkey Forest",
+                        icon: "🐒",
+                        category: "Nature/Culture",
+                        description: "Walk through this enchanting forest sanctuary home to over 700 Balinese long-tailed macaques. The forest contains ancient temples and is considered a sacred spiritual center by locals.",
+                        details: [
+                            {type: "Best Time", info: "Early morning (8-10am) or late afternoon (3-5pm)"},
+                            {type: "Duration", info: "1-2 hours"},
+                            {type: "Cost", info: "80,000 IDR (~$5 USD) per adult"},
+                            {type: "Tips", info: "Don't bring food or plastic bags. Remove sunglasses and dangling jewelry. Don't stare directly at monkeys as they may perceive it as a challenge."}
+                        ],
+                        locations: ["Ubud"]
+                    },
+                    {
+                        title: "Mount Batur Sunrise Hike",
+                        icon: "🌋",
+                        category: "Adventure",
+                        description: "Embark on an early morning trek up an active volcano to witness one of Bali's most magical experiences - sunrise from the summit of Mount Batur, with panoramic views across Lake Batur and neighboring Mount Agung.",
+                        details: [
+                            {type: "Best Time", info: "Start at 2:30am to reach summit by sunrise (5:45-6:15am)"},
+                            {type: "Duration", info: "6-7 hours (2-3 hours up, 1.5-2 hours down, plus time at summit)"},
+                            {type: "Cost", info: "500,000-700,000 IDR (~$35-45 USD) per person"},
+                            {type: "Tips", info: "Wear layers (it's cold before sunrise), sturdy shoes, and bring a headlamp. The trek is moderate difficulty but achievable for most fitness levels."}
+                        ],
+                        locations: ["Kintamani"]
+                    },
+                    {
+                        title: "Traditional Balinese Cooking Class",
+                        icon: "🍲",
+                        category: "Culture/Food",
+                        description: "Learn the secrets of authentic Balinese cuisine in this hands-on culinary adventure. Visit local markets to select fresh ingredients, then prepare traditional dishes under the guidance of expert local chefs.",
+                        details: [
+                            {type: "Best Time", info: "Morning classes (8am-1pm) include market visits"},
+                            {type: "Duration", info: "4-6 hours"},
+                            {type: "Cost", info: "400,000-600,000 IDR (~$25-40 USD) per person"},
+                            {type: "Booking", info: "Reserve 1-2 days in advance, especially in high season"}
+                        ],
+                        locations: ["Ubud", "Seminyak"]
+                    }
+                ],
+                practicalInfo: {
+                    transportation: [
+                        {details: "Private drivers are the most comfortable option for longer journeys (400-600k IDR/day)."},
+                        {details: "Ride-hailing apps (Gojek, Grab) work well in tourist areas but are banned in some locations."},
+                        {details: "Scooter rentals cost 60-80k IDR/day, but require international driving permit and experience."}
+                    ],
+                    packingEssentials: [
+                        {items: "Light, breathable clothing (cotton or linen)"},
+                        {items: "Modest clothing for temple visits (shoulders and knees covered)"},
+                        {items: "High SPF sunscreen, insect repellent, and rain jacket/umbrella"},
+                        {items: "Portable water bottle with filter (tap water isn't potable)"}
+                    ],
+                    moneyMatters: {
+                        currency: "Indonesian Rupiah (IDR)",
+                        paymentMethods: "ATMs widely available in tourist areas, credit cards accepted at upscale establishments but carry cash for smaller vendors",
+                        tipping: "Not required but appreciated (10% for good service)"
+                    },
+                    connectivity: {
+                        internetAccess: "Most accommodations and cafes offer free WiFi",
+                        localSim: "Local SIM cards available at airport (Telkomsel recommended for coverage)",
+                        usefulApps: ["Gojek", "WhatsApp", "Maps.me"]
+                    }
+                }
+            };
+                
+            // Initialize trip data variable
+            let tripData;
+            
+            // Attempt to load trip data from localStorage or use default data
+            try {
+                // Try to get data from localStorage
+                const storedData = localStorage.getItem('tripData');
+                if (storedData) {
+                    tripData = JSON.parse(storedData);
+                } else {
+                    // If no localStorage data, use demo data
+                    tripData = demoTripData;
+                }
+            } catch (error) {
+                // If there's any error (like SecurityError in sandboxed environments),
+                // fallback to demo data
+                console.log('Using demo trip data instead of localStorage');
+                tripData = demoTripData;
+            }
+            
+            // Now use tripData to populate the page
+            if (tripData) {
+                // Populate data based on tripData JSON structure
+                if (tripData.tripDetails) {
+                    document.getElementById('destinationTitle').textContent = tripData.tripDetails.destination || 'Bali Paradise';
+                    document.getElementById('tripName').textContent = tripData.tripDetails.tripName || 'Island Adventure & Cultural Immersion';
+                    
+                    // Format dates
+                    if (tripData.tripDetails.startDate && tripData.tripDetails.endDate) {
+                        const startDate = new Date(tripData.tripDetails.startDate);
+                        const endDate = new Date(tripData.tripDetails.endDate);
+                        
+                        const options = { month: 'long', day: 'numeric' };
+                        const formattedStart = startDate.toLocaleDateString('en-US', options);
+                        const formattedEnd = endDate.toLocaleDateString('en-US', options);
+                        const year = startDate.getFullYear();
+                        
+                        document.getElementById('tripDates').textContent = `${formattedStart} - ${formattedEnd}, ${year}`;
+                    }
+                }
+                
+                // Populate overview section
+                if (tripData.overview) {
+                    const overviewSection = document.getElementById('overview');
+                    overviewSection.innerHTML = `
+                        <div class="overview-line"></div>
+                        <h2>Trip Overview</h2>
+                        <p>${tripData.overview.description || 'Your custom trip description will appear here.'}</p>
+                    `;
+                    
+                    // Add weather info if available
+                    if (tripData.overview.weatherInfo) {
+                        const weatherWidget = document.getElementById('weatherWidget');
+                        weatherWidget.innerHTML = `
+                            <div class="weather-item"><i class="fa-solid fa-temperature-half"></i> ${tripData.overview.weatherInfo.temperatureRange || '24-32°C'}</div>
+                            <div class="weather-item"><i class="fa-solid fa-cloud-sun"></i> ${tripData.overview.weatherInfo.seasonDescription || 'Mostly Sunny'}</div>
+                            <div class="weather-item"><i class="fa-solid fa-droplet"></i> ${tripData.overview.weatherInfo.climateNotes || '70% Humidity'}</div>
+                        `;
+                    }
+                    
+                    // Add highlights if available
+                    if (tripData.overview.keyHighlights && tripData.overview.keyHighlights.length) {
+                        const highlightsContainer = document.createElement('div');
+                        highlightsContainer.className = 'highlights';
+                        
+                        tripData.overview.keyHighlights.forEach(highlight => {
+                            const highlightDiv = document.createElement('div');
+                            highlightDiv.className = 'highlight';
+                            highlightDiv.innerHTML = `<span class="highlight-icon">✨</span> ${highlight}`;
+                            highlightsContainer.appendChild(highlightDiv);
+                        });
+                        
+                        overviewSection.appendChild(highlightsContainer);
+                    }
+                }
+                
+                // Populate daily itinerary
+                if (tripData.dailyItinerary && tripData.dailyItinerary.length) {
+                    const itineraryContainer = document.getElementById('dailyItinerary');
+                    itineraryContainer.innerHTML = '<h2 class="section-title">Daily Itinerary</h2>';
+                    
+                    tripData.dailyItinerary.forEach(day => {
+                        const dayCard = document.createElement('div');
+                        dayCard.className = 'day-card';
+                        
+                        // Create day header
+                        const dayHeader = document.createElement('div');
+                        dayHeader.className = 'day-header';
+                        dayHeader.innerHTML = `
+                            <div class="day-number">${day.day || '1'}</div>
+                            <div class="day-title">
+                                <h3>${day.title || 'Day Title'}</h3>
+                                <div class="location"><i class="fa-solid fa-location-dot"></i> ${day.location || 'Location'} <a href="${day.locationMapUrl || '#'}" target="_blank">View on map</a></div>
+                            </div>
+                        `;
+                        
+                        // Create day content
+                        const dayContent = document.createElement('div');
+                        dayContent.className = 'day-content';
+                        
+                        // Add transportation info if available
+                        if (day.transportation) {
+                            dayContent.innerHTML += `
+                                <div class="commute-info"><i class="fa-solid fa-car"></i> ${day.transportation.mode || 'Transfer'} (${day.transportation.duration || 'N/A'}, ${day.transportation.distance || 'N/A'})</div>
+                            `;
+                        }
+                        
+                        // Add day description
+                        dayContent.innerHTML += `<p>${day.description || 'Day description will appear here.'}</p>`;
+                        
+                        // Add activities if available
+                        if (day.activities && day.activities.length) {
+                            const activityList = document.createElement('ul');
+                            activityList.className = 'activity-list';
+                            
+                            day.activities.forEach(activity => {
+                                const activityItem = document.createElement('li');
+                                activityItem.textContent = activity;
+                                activityList.appendChild(activityItem);
+                            });
+                            
+                            dayContent.appendChild(activityList);
+                        }
+                        
+                        // Add special highlight if available
+                        if (day.specialHighlight) {
+                            dayContent.innerHTML += `
+                                <div class="special-box">
+                                    <div class="special-title"><i class="fa-solid fa-star"></i> ${day.specialHighlight.title || 'Special Experience'}</div>
+                                    <p>${day.specialHighlight.description || 'Special experience description will appear here.'}</p>
+                                </div>
+                            `;
+                        }
+                        
+                        // Add accommodation options if available
+                        if (day.accommodationOptions && day.accommodationOptions.length) {
+                            dayContent.innerHTML += `<h4 class="day-section-title">Where to Stay</h4>`;
+                            
+                            const stayOptions = document.createElement('div');
+                            stayOptions.className = 'stay-options';
+                            
+                            day.accommodationOptions.forEach((option, index) => {
+                                const optionDiv = document.createElement('div');
+                                optionDiv.className = 'stay-option';
+                                
+                                // Determine label based on index
+                                let label;
+                                if (index === 0) label = 'Luxury';
+                                else if (index === 1) label = 'Mid-Range';
+                                else label = 'Budget';
+                                
+                                optionDiv.innerHTML = `
+                                    <div class="option-label">${label}</div>
+                                    <h4>${option.name || 'Accommodation Name'}</h4>
+                                    <p>${option.description || 'Accommodation description will appear here.'}</p>
+                                    <div class="price-range">${option.priceRange || 'Price range'}</div>
+                                `;
+                                
+                                // Add amenities as tags if available
+                                if (option.amenities && option.amenities.length) {
+                                    const tagsContainer = document.createElement('div');
+                                    tagsContainer.className = 'tags-container';
+                                    
+                                    const tagColors = ['blue', 'orange', 'green', 'red'];
+                                    option.amenities.forEach((amenity, i) => {
+                                        const tagSpan = document.createElement('span');
+                                        tagSpan.className = `tag ${tagColors[i % tagColors.length]}`;
+                                        tagSpan.textContent = amenity;
+                                        tagsContainer.appendChild(tagSpan);
+                                    });
+                                    
+                                    optionDiv.appendChild(tagsContainer);
+                                }
+                                
+                                stayOptions.appendChild(optionDiv);
+                            });
+                            
+                            dayContent.appendChild(stayOptions);
+                        }
+                        
+                        // Append header and content to the day card
+                        dayCard.appendChild(dayHeader);
+                        dayCard.appendChild(dayContent);
+                        
+                        // Append the day card to the itinerary container
+                        itineraryContainer.appendChild(dayCard);
+                    });
+                }
+                
+                // Populate key experiences
+                if (tripData.keyExperiences && tripData.keyExperiences.length) {
+                    const experiencesGrid = document.getElementById('keyExperiences');
+                    experiencesGrid.innerHTML = '';
+                    
+                    tripData.keyExperiences.forEach(experience => {
+                        const card = document.createElement('div');
+                        card.className = 'experience-card';
+                        
+                        // Create card header
+                        const cardHeader = document.createElement('div');
+                        cardHeader.className = 'card-header';
+                        cardHeader.innerHTML = `
+                            <h3>${experience.title || 'Experience Title'}</h3>
+                            <div class="exp-icon">${experience.icon || '✨'}</div>
+                        `;
+                        
+                        // Create card content
+                        const cardContent = document.createElement('div');
+                        cardContent.className = 'card-content';
+                        cardContent.innerHTML = `<p>${experience.description || 'Experience description will appear here.'}</p>`;
+                        
+                        // Add details if available
+                        if (experience.details && experience.details.length) {
+                            const detailList = document.createElement('div');
+                            detailList.className = 'detail-list';
+                            
+                            experience.details.forEach(detail => {
+                                const detailItem = document.createElement('div');
+                                detailItem.className = 'detail-item';
+                                
+                                // Choose icon based on detail type
+                                let icon;
+                                switch (detail.type.toLowerCase()) {
+                                    case 'best time':
+                                        icon = 'fa-regular fa-clock';
+                                        break;
+                                    case 'duration':
+                                        icon = 'fa-solid fa-hourglass-half';
+                                        break;
+                                    case 'cost':
+                                        icon = 'fa-solid fa-dollar-sign';
+                                        break;
+                                    case 'booking':
+                                        icon = 'fa-solid fa-bookmark';
+                                        break;
+                                    case 'tips':
+                                        icon = 'fa-solid fa-lightbulb';
+                                        break;
+                                    default:
+                                        icon = 'fa-solid fa-circle-info';
+                                }
+                                
+                                detailItem.innerHTML = `
+                                    <div class="detail-icon"><i class="${icon}"></i></div>
+                                    <div class="detail-content">
+                                        <div class="detail-type">${detail.type || 'Detail'}</div>
+                                        <div>${detail.info || 'Information will appear here.'}</div>
+                                    </div>
+                                `;
+                                
+                                detailList.appendChild(detailItem);
+                            });
+                            
+                            cardContent.appendChild(detailList);
+                        }
+                        
+                        // Append header and content to the card
+                        card.appendChild(cardHeader);
+                        card.appendChild(cardContent);
+                        
+                        // Append the card to the experiences grid
+                        experiencesGrid.appendChild(card);
+                    });
+                }
+                
+                // Populate practical information
+                if (tripData.practicalInfo) {
+                    const practicalInfo = document.getElementById('practicalInfo');
+                    practicalInfo.innerHTML = '<h2 class="section-title">Practical Information</h2>';
+                    
+                    const tipsGrid = document.createElement('div');
+                    tipsGrid.className = 'tips-grid';
+                    
+                    // Function to create a tip card
+                    function createTipCard(title, icon, items) {
+                        const card = document.createElement('div');
+                        card.className = 'tip-card';
+                        
+                        const cardHeader = document.createElement('div');
+                        cardHeader.className = 'tip-header';
+                        cardHeader.innerHTML = `<div class="tip-icon"><i class="${icon}"></i></div>${title}`;
+                        
+                        const cardContent = document.createElement('div');
+                        cardContent.className = 'tip-content';
+                        
+                        const tipList = document.createElement('ul');
+                        tipList.className = 'tip-list';
+                        
+                        items.forEach(item => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                <div>${typeof item === 'string' ? item : (item.tip || item.information || item.details || item.items || 'Information')}</div>
+                            `;
+                            tipList.appendChild(li);
+                        });
+                        
+                        cardContent.appendChild(tipList);
+                        card.appendChild(cardHeader);
+                        card.appendChild(cardContent);
+                        
+                        return card;
+                    }
+                    
+                    // Add transportation tips
+                    if (tripData.practicalInfo.transportation && tripData.practicalInfo.transportation.length) {
+                        tipsGrid.appendChild(createTipCard('Transportation', 'fa-solid fa-plane-departure', tripData.practicalInfo.transportation));
+                    }
+                    
+                    // Add packing essentials
+                    if (tripData.practicalInfo.packingEssentials && tripData.practicalInfo.packingEssentials.length) {
+                        tipsGrid.appendChild(createTipCard('Packing Essentials', 'fa-solid fa-suitcase', tripData.practicalInfo.packingEssentials));
+                    }
+                    
+                    // Add money matters
+                    if (tripData.practicalInfo.moneyMatters) {
+                        const moneyItems = [
+                            `Currency: ${tripData.practicalInfo.moneyMatters.currency || 'Local currency'}`,
+                            `Payment: ${tripData.practicalInfo.moneyMatters.paymentMethods || 'Common payment methods'}`,
+                            `Tipping: ${tripData.practicalInfo.moneyMatters.tipping || 'Tipping customs'}`
+                        ];
+                        tipsGrid.appendChild(createTipCard('Money Matters', 'fa-solid fa-wallet', moneyItems));
+                    }
+                    
+                    // Add connectivity info
+                    if (tripData.practicalInfo.connectivity) {
+                        const connectivityItems = [
+                            `Internet: ${tripData.practicalInfo.connectivity.internetAccess || 'WiFi information'}`,
+                            `Local SIM: ${tripData.practicalInfo.connectivity.localSim || 'SIM card information'}`
+                        ];
+                        
+                        if (tripData.practicalInfo.connectivity.usefulApps && tripData.practicalInfo.connectivity.usefulApps.length) {
+                            connectivityItems.push(`Useful Apps: ${tripData.practicalInfo.connectivity.usefulApps.join(', ')}`);
+                        }
+                        
+                        tipsGrid.appendChild(createTipCard('Connectivity', 'fa-solid fa-wifi', connectivityItems));
+                    }
+                    
+                    practicalInfo.appendChild(tipsGrid);
                 }
             }
-            return null;
-        }
-
-        const tripData = JSON.parse(localStorage.getItem('tripData')); // Get from localStorage
-
-        function renderTripDetails(data) {
-            document.getElementById('destinationTitle').textContent = data.tripDetails.destination;
-            document.getElementById('tripName').textContent = data.tripDetails.tripName;
-            document.getElementById('tripDates').textContent = 
-                `${data.tripDetails.startDate} to ${data.tripDetails.endDate}`;
-            
-            document.getElementById('weatherWidget').innerHTML = `
-                <div class="weather-item">🌡️ ${data.overview.weatherInfo.temperatureRange}</div>
-                <div class="weather-item">☀️ ${data.overview.weatherInfo.seasonDescription}</div>
-                <div class="weather-item">🌊 ${data.overview.weatherInfo.climateNotes}</div>
-                <div class="weather-item">📝 ${data.overview.weatherInfo.weatherConsiderations}</div>
-            `;
-        }
-
-        function renderOverview(data) {
-            const overview = document.getElementById('overview');
-            overview.innerHTML = `
-                <h2>${data.tripDetails.travelers.map(t => t.name).join(' & ')}'s ${data.tripDetails.tripType}</h2>
-                <p>${data.overview.description}</p>
-                <div class="highlights">
-                    ${data.overview.keyHighlights.map(highlight => 
-                        `<div class="highlight"><span class="highlight-icon">•</span>${highlight}</div>`
-                    ).join('')}
-                </div>
-            `;
-        }
-
-        function renderDailyItinerary(data) {
-            const container = document.getElementById('dailyItinerary');
-            data.dailyItinerary.forEach(day => {
-                container.innerHTML += `
-                    <div class="day-card">
-                        <div class="day-title">
-                            <div class="day-number">${day.day}</div>
-                            <h3>${day.title}</h3>
-                        </div>
-                        <div class="location">${day.location}</div>
-                        <p>${day.description}</p>
-                        <ul class="activity-list">
-                            ${day.activities.map(activity => `<li>${activity}</li>`).join('')}
-                        </ul>
-                        <div class="special-box">
-                            <div class="special-title" data-icon="✨">${day.specialHighlight.title}</div>
-                            <p>${day.specialHighlight.description}</p>
-                        </div>
-                        <div class="stay-options">
-                            ${day.accommodationOptions.map(option => `
-                                <div class="stay-option">
-                                    <div class="option-label">${option.bestFor}</div>
-                                    <h4>${option.name}</h4>
-                                    <p>${option.description}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function renderKeyExperiences(data) {
-            const container = document.getElementById('keyExperiences');
-            data.keyExperiences.forEach(exp => {
-                container.innerHTML += `
-                    <div class="experience-card">
-                        <div class="card-header">
-                            <h3>${exp.title}</h3>
-                            <div class="exp-icon">${exp.icon}</div>
-                        </div>
-                        <div class="card-content">
-                            <p>${exp.description}</p>
-                            <div class="detail-list">
-                                ${exp.details.map(detail => `
-                                    <div class="detail-item">
-                                        <div class="detail-icon">•</div>
-                                        <div><strong>${detail.type}:</strong> ${detail.info}</div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function renderPracticalInfo(data) {
-            const container = document.getElementById('practicalInfo');
-            container.innerHTML = `
-                <h2>Practical Information</h2>
-                <div class="tips-grid">
-                    ${Object.entries(data.practicalInfo).map(([category, items]) => `
-                        <div class="tip-card">
-                            <div class="tip-header">
-                                <span class="tip-icon">📌</span>
-                                ${category.charAt(0).toUpperCase() + category.slice(1)}
-                            </div>
-                            <div class="tip-content">
-                                <ul class="tip-list">
-                                    ${Array.isArray(items) ? items.map(item => `
-                                        <li>
-                                            <span class="tip-marker">•</span>
-                                            <div>${item.type || item.category}: ${item.details || item.information || item.tip || item.items}</div>
-                                        </li>
-                                    `).join('') : ''}
-                                </ul>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        renderTripDetails(tripData);
-        renderOverview(tripData);
-        renderDailyItinerary(tripData);
-        renderKeyExperiences(tripData);
-        renderPracticalInfo(tripData);
+        });
     </script>
 </body>
 </html>
