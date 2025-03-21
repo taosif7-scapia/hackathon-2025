@@ -1,5 +1,7 @@
 let currentStep = 1;
 const totalSteps = 5; // Reduced from 6
+let suggestionsLoaded = false;
+let currentSuggestions = []; // Add this line to store suggestions
 
 const loaderMessages = [
     "Crafting your perfect itinerary... 🌍",
@@ -15,6 +17,81 @@ const loaderMessages = [
 ];
 
 let loaderInterval;
+
+// Add this function to generate shimmer chips
+function addShimmerChips() {
+    const container = document.getElementById('suggestedChips');
+    container.innerHTML = '';
+    for (let i = 0; i < 6; i++) {
+        const chip = document.createElement('div');
+        chip.className = 'chip shimmer';
+        chip.style.width = `${Math.random() * (120 - 80) + 80}px`;
+        chip.innerHTML = '&nbsp;';
+        container.appendChild(chip);
+    }
+}
+
+// Add this function to fetch suggestions
+async function fetchSuggestions() {
+    const destination = document.getElementById('destination').value;
+    const dates = document.getElementById('dateRange').value;
+    const travelers = document.getElementById('travelers').value;
+
+    const messages = [
+        {
+            role: "system",
+            content: "Generate a list of 10-15 relevant activity and preference suggestions for a trip based on the destination, dates, and travel group composition. Each item should be one or two words only. Return only a JSON array of strings."
+        },
+        {
+            role: "user",
+            content: `Destination: ${destination}
+Dates: ${dates}
+Travel Group: ${travelers}
+Provide relevant suggestions for activities and experiences that would suit this group of travelers at this destination.`
+        }
+    ];
+
+    try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer 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`
+            },
+            body: JSON.stringify({
+                model: "gpt-4-turbo",
+                messages: messages,
+                temperature: 0.7
+            })
+        });
+
+        const result = await response.json();
+        const suggestions = JSON.parse(result.choices[0].message.content);
+        displaySuggestions(suggestions);
+    } catch (error) {
+        console.error("Failed to fetch suggestions:", error);
+        document.getElementById('suggestedChips').innerHTML = '<p class="text-muted">Failed to load suggestions</p>';
+    }
+}
+
+// Add this function to display suggestions
+function displaySuggestions(suggestions) {
+    const container = document.getElementById('suggestedChips');
+    container.innerHTML = '';
+    currentSuggestions = suggestions; // Store suggestions
+    suggestions.forEach(suggestion => {
+        const chip = document.createElement('div');
+        chip.className = 'chip suggestion-chip';
+        chip.textContent = suggestion;
+        chip.onclick = () => {
+            addChip(suggestion);
+            // Remove the selected suggestion and re-render
+            currentSuggestions = currentSuggestions.filter(s => s !== suggestion);
+            displaySuggestions(currentSuggestions);
+        };
+        container.appendChild(chip);
+    });
+}
 
 function showStep(step) {
     document.querySelectorAll('.form-step').forEach((el, index) => {
@@ -35,6 +112,13 @@ function showStep(step) {
     document.getElementById("prevBtn").disabled = step === 1;
     document.getElementById("nextBtn").classList.toggle("d-none", step === totalSteps);
     document.getElementById("submitBtn").classList.toggle("d-none", step !== totalSteps);
+
+    // Start fetching suggestions when reaching step 3
+    if (step === 4) {
+        suggestionsLoaded = true;
+        addShimmerChips();
+        fetchSuggestions();
+    }
 }
 
 function nextStep() {
@@ -51,31 +135,34 @@ function prevStep() {
     }
 }
 
+// Modify the addChip function to be globally accessible
+function addChip(value) {
+    if (!value.trim()) return;
+    
+    const chipsContainer = document.getElementById('preferencesChips');
+    const chipInput = document.getElementById('chipInput');
+    const hiddenInput = document.getElementById('preferences');
+
+    // Check if chip already exists
+    const existingChips = Array.from(chipsContainer.getElementsByClassName('chip'));
+    if (existingChips.some(chip => chip.textContent.trim().slice(0, -1) === value.trim())) {
+        return;
+    }
+
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `
+        ${value}
+        <span class="chip-close" onclick="this.parentElement.remove(); updateHiddenInput();">&times;</span>
+    `;
+    chipsContainer.insertBefore(chip, chipInput);
+    chipInput.value = '';
+    updateHiddenInput();
+}
+
 // Add chip functionality
 function initializeChips() {
-    const chipsContainer = document.getElementById('preferencesChips');
-    const hiddenInput = document.getElementById('preferences');
     const chipInput = document.getElementById('chipInput');
-
-    function addChip(value) {
-        if (!value.trim()) return;
-
-        const chip = document.createElement('div');
-        chip.className = 'chip';
-        chip.innerHTML = `
-            ${value}
-            <span class="chip-close" onclick="this.parentElement.remove(); updateHiddenInput();">&times;</span>
-        `;
-        chipsContainer.insertBefore(chip, chipInput);
-        chipInput.value = '';
-        updateHiddenInput();
-    }
-
-    function updateHiddenInput() {
-        const chips = Array.from(chipsContainer.getElementsByClassName('chip'));
-        const values = chips.map(chip => chip.textContent.trim().slice(0, -1)); // Remove × from the text
-        hiddenInput.value = values.join(',');
-    }
 
     chipInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ',') {

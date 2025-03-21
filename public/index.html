@@ -50,6 +50,23 @@
             color: #006C9A;
             margin-top: 20px;
         }
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        .suggestion-chip {
+            background: #e3f2fd;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .suggestion-chip:hover {
+            background: #bbdefb;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
     </style>
 </head>
 <body>
@@ -73,8 +90,11 @@
                     </div>
 
                     <div class="form-step d-none" id="step-4">
-                        <label for="chipInput">Your Preferences:</label>
+                        <label for="chipInput">Your Interests:</label>
                         <input type="hidden" id="preferences" name="preferences" required>
+                        <div id="suggestedChips" class="mb-3 d-flex flex-wrap gap-2">
+                            <!-- Shimmer chips will be added here -->
+                        </div>
                         <div class="chips-container" id="preferencesChips">
                             <input type="text" id="chipInput" placeholder="Type and press Enter (e.g., beaches, nightlife)">
                         </div>
