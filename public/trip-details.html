@@ -1303,8 +1303,6 @@
     <script src="https://kit.fontawesome.com/123abc123a.js" crossorigin="anonymous"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Set header background
-            document.getElementById('headerBg').style.backgroundImage = "url('https://assets.vogue.com/photos/677ec42ad09dd248a648fa95/master/w_2560%2Cc_limit/CW_Drone_20.2.20DJI_0062.jpg')";
             
             // Add page loaded class for animations
             setTimeout(function() {
@@ -1522,6 +1520,11 @@
             if (tripData) {
                 // Populate data based on tripData JSON structure
                 if (tripData.tripDetails) {
+
+                    // Set header background
+                    document.getElementById('headerBg').style.backgroundImage = 'url('+(tripData.tripDetails.heroImage || 'https://source.unsplash.com/1600x900/?beach')+')'; 
+            
+
                     document.getElementById('destinationTitle').textContent = tripData.tripDetails.destination || 'Bali Paradise';
                     document.getElementById('tripName').textContent = tripData.tripDetails.tripName || 'Island Adventure & Cultural Immersion';
                     

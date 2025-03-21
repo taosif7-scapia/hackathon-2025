@@ -1,5 +1,20 @@
 let currentStep = 1;
-const totalSteps = 6;
+const totalSteps = 5; // Reduced from 6
+
+const loaderMessages = [
+    "Crafting your perfect itinerary... 🌍",
+    "Discovering hidden gems just for you... ✨",
+    "Checking the best local experiences... 🎯",
+    "Mapping out your adventure... 🗺️",
+    "Consulting with local experts... 👥",
+    "Personalizing your journey... 🎨",
+    "Finding the perfect spots for your interests... 🎯",
+    "Calculating optimal routes... 🚗",
+    "Checking seasonal recommendations... 🌤️",
+    "Almost there, adding final touches... ✨"
+];
+
+let loaderInterval;
 
 function showStep(step) {
     document.querySelectorAll('.form-step').forEach((el, index) => {
@@ -12,8 +27,7 @@ function showStep(step) {
         "When are you going?",
         "Who's coming with you?",
         "Your Preferences",
-        "Budget & Accommodation",
-        "Review & Submit"
+        "Budget & Accommodation"
     ];
     document.getElementById("step-title").innerText = titles[step - 1];
 
@@ -21,18 +35,6 @@ function showStep(step) {
     document.getElementById("prevBtn").disabled = step === 1;
     document.getElementById("nextBtn").classList.toggle("d-none", step === totalSteps);
     document.getElementById("submitBtn").classList.toggle("d-none", step !== totalSteps);
-
-    // Show JSON summary at last step
-    if (step === totalSteps) {
-        const data = {
-            destination: document.getElementById("destination").value,
-            tripDetails: document.getElementById("dateRange").value,
-            travelers: document.getElementById("travelers").value,
-            preferences: document.getElementById("preferences").value,
-            budget: document.getElementById("budget").value
-        };
-        document.getElementById("jsonOutput").textContent = JSON.stringify(data, null, 2);
-    }
 }
 
 function nextStep() {
@@ -49,9 +51,59 @@ function prevStep() {
     }
 }
 
-// Handle form submission
+// Add chip functionality
+function initializeChips() {
+    const chipsContainer = document.getElementById('preferencesChips');
+    const hiddenInput = document.getElementById('preferences');
+    const chipInput = document.getElementById('chipInput');
+
+    function addChip(value) {
+        if (!value.trim()) return;
+
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.innerHTML = `
+            ${value}
+            <span class="chip-close" onclick="this.parentElement.remove(); updateHiddenInput();">&times;</span>
+        `;
+        chipsContainer.insertBefore(chip, chipInput);
+        chipInput.value = '';
+        updateHiddenInput();
+    }
+
+    function updateHiddenInput() {
+        const chips = Array.from(chipsContainer.getElementsByClassName('chip'));
+        const values = chips.map(chip => chip.textContent.trim().slice(0, -1)); // Remove × from the text
+        hiddenInput.value = values.join(',');
+    }
+
+    chipInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            addChip(chipInput.value);
+        }
+    });
+
+    chipInput.addEventListener('blur', () => {
+        if (chipInput.value) {
+            addChip(chipInput.value);
+        }
+    });
+}
+
+// Modify form submission
 document.getElementById("travelForm").addEventListener("submit", async function (event) {
     event.preventDefault();
+
+    // Show loader
+    document.getElementById('formContainer').classList.add('d-none');
+    document.getElementById('loaderContainer').classList.remove('d-none');
+
+    let messageIndex = 0;
+    loaderInterval = setInterval(() => {
+        document.getElementById('loaderMessage').textContent = loaderMessages[messageIndex];
+        messageIndex = (messageIndex + 1) % loaderMessages.length;
+    }, 3000);
 
     const formData = {
         destination: document.getElementById("destination").value,
@@ -62,6 +114,11 @@ document.getElementById("travelForm").addEventListener("submit", async function 
     };
 
     console.log("Submitting:", formData);
+
+    // Get hero image for the destination
+    const imageResponse = await fetch(`https://www.googleapis.com/customsearch/v1?key=AIzaSyDaQL3QVmYWjNVg1_XA8V0dKpC5X9qysI0&cx=4240c891e0cad4fa3&searchType=image&q=${encodeURIComponent(formData.destination+ ' wallpaper cover image HD')}`);
+    const imageData = await imageResponse.json();
+    const heroImage = imageData.items?.[0]?.link || '';
 
     const messages = [
         {
@@ -220,6 +277,8 @@ Cultural Enthusiasts: Historical sites, immersive experiences, guided tours.`
         temperature: 0.7
     };
 
+    console.log("Requesting:", requestBody);
+
     try {
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
@@ -232,20 +291,29 @@ Cultural Enthusiasts: Historical sites, immersive experiences, guided tours.`
 
         const result = await response.json();
         let tripData = JSON.parse(result['choices'][0]['message']['content']);
+        tripData['tripDetails']['heroImage'] = heroImage;
         localStorage.setItem("tripData", JSON.stringify(tripData));
 
-        // Redirect after successful submission
+
+        clearInterval(loaderInterval);
         window.location.href = "/trip-details.html";
     } catch (error) {
+        clearInterval(loaderInterval);
         console.error("Submission failed:", error);
+        // Show error message to user
+        document.getElementById('formContainer').classList.remove('d-none');
+        document.getElementById('loaderContainer').classList.add('d-none');
     }
 });
 
-// Initialize first step
-showStep(currentStep);
+// Initialize first step and chips
+document.addEventListener('DOMContentLoaded', () => {
+    showStep(currentStep);
+    initializeChips();
+});
 
 // Move to next step on Enter key press
-document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
         event.preventDefault();
         nextStep();

@@ -6,44 +6,108 @@
     <title>Travel Itinerary Chatbot</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/styles.css" type="text/css">
+    <style>
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            min-height: 45px;
+        }
+        .chip {
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .chip-close {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #chipInput {
+            border: none;
+            outline: none;
+            padding: 4px;
+            flex: 1;
+            min-width: 100px;
+        }
+        .loader-container {
+            text-align: center;
+            padding: 40px;
+        }
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+        .loader-message {
+            font-size: 1.2rem;
+            color: #006C9A;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container vh-100 d-flex align-items-center justify-content-center">
         <div class="card p-4 shadow-lg" style="max-width: 500px; width: 100%;">
-            <h2 class="text-center mb-3" id="step-title">Where are you planning to travel?</h2>
-            <form id="travelForm">
-                <div class="form-step" id="step-1">
-                    <input type="text" class="form-control" id="destination" placeholder="Enter destination" required>
-                </div>
+            <!-- Form Container -->
+            <div id="formContainer">
+                <h2 class="text-center mb-3" id="step-title">Where are you planning to travel?</h2>
+                <form id="travelForm">
+                    <div class="form-step" id="step-1">
+                        <input type="text" class="form-control" id="destination" placeholder="Enter destination" required>
+                    </div>
 
-                <div class="form-step d-none" id="step-2">
-                    <label for="dateRange">Travel Dates:</label>
-                    <input type="text" id="dateRange" name="dateRange" placeholder="Select date range">
-                </div>
+                    <div class="form-step d-none" id="step-2">
+                        <label for="dateRange">Travel Dates:</label>
+                        <input type="text" id="dateRange" name="dateRange" placeholder="Select date range">
+                    </div>
 
-                <div class="form-step d-none" id="step-3">
-                    <textarea class="form-control" id="travelers" placeholder="Who's coming with you?" required></textarea>
-                </div>
+                    <div class="form-step d-none" id="step-3">
+                        <textarea class="form-control" id="travelers" placeholder="Who's coming with you?" required></textarea>
+                    </div>
 
-                <div class="form-step d-none" id="step-4">
-                    <textarea class="form-control" id="preferences" placeholder="Your preferences (e.g., beaches, nightlife)" required></textarea>
-                </div>
+                    <div class="form-step d-none" id="step-4">
+                        <label for="chipInput">Your Preferences:</label>
+                        <input type="hidden" id="preferences" name="preferences" required>
+                        <div class="chips-container" id="preferencesChips">
+                            <input type="text" id="chipInput" placeholder="Type and press Enter (e.g., beaches, nightlife)">
+                        </div>
+                    </div>
 
-                <div class="form-step d-none" id="step-5">
-                    <input type="text" class="form-control" id="budget" placeholder="Your budget per person" required>
-                </div>
+                    <div class="form-step d-none" id="step-5">
+                        <input type="text" class="form-control" id="budget" placeholder="Your budget per person" required>
+                    </div>
 
-                <div class="form-step d-none" id="step-6">
-                    <p class="text-center">Review your details before submission:</p>
-                    <pre id="jsonOutput" class="bg-light p-2 rounded"></pre>
-                </div>
+                    <div class="form-step d-none" id="step-6">
+                        <p class="text-center">Review your details before submission:</p>
+                        <pre id="jsonOutput" class="bg-light p-2 rounded"></pre>
+                    </div>
 
-                <div class="d-flex justify-content-between mt-3">
-                    <button type="button" class="btn btn-secondary" id="prevBtn" onclick="prevStep()" disabled>Back</button>
-                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next</button>
-                    <button type="submit" class="btn btn-success d-none" id="submitBtn">Submit</button>
+                    <div class="d-flex justify-content-between mt-3">
+                        <button type="button" class="btn btn-secondary" id="prevBtn" onclick="prevStep()" disabled>Back</button>
+                        <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextStep()">Next</button>
+                        <button type="submit" class="btn btn-success d-none" id="submitBtn">Create My Trip</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loader Container -->
+            <div id="loaderContainer" class="loader-container d-none d-flex flex-column align-items-center justify-content-center">
+                <div class="loader-spinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
-            </form>
+                <div id="loaderMessage" class="loader-message">
+                    Crafting your perfect itinerary... 🌍
+                </div>
+            </div>
         </div>
     </div>
 
