@@ -31,6 +31,24 @@ function addShimmerChips() {
     }
 }
 
+// Add this function after addShimmerChips
+function addBudgetShimmerChips() {
+    const container = document.getElementById('budgetSuggestions');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="budget-options">
+            ${Array(3).fill(0).map(() => `
+                <div class="budget-chip shimmer">
+                    <div class="budget-type">&nbsp;</div>
+                    <div class="budget-amount">&nbsp;</div>
+                    <small>&nbsp;</small>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
 // Add this function to fetch suggestions
 async function fetchSuggestions() {
     const destination = document.getElementById('destination').value;
@@ -93,6 +111,92 @@ function displaySuggestions(suggestions) {
     });
 }
 
+// Add after the displaySuggestions function
+async function fetchBudgetSuggestions() {
+    // Add shimmer effect before fetching
+    addBudgetShimmerChips();
+
+    const destination = document.getElementById('destination').value;
+    const dateRange = document.getElementById('dateRange').value;
+    const travelers = document.getElementById('travelers').value;
+    const preferences = document.getElementById('preferences').value;
+
+    const messages = [
+        {
+            role: "system",
+            content: "You are a travel budget expert. Generate three budget ranges (Budget, Mid-Range, Luxury) in INR for the trip. Return only a JSON object with three properties: low, mid, and high. Each should include a price and description."
+        },
+        {
+            role: "user",
+            content: `Generate budget ranges for:
+Destination: ${destination}
+Dates: ${dateRange}
+Group: ${travelers}
+Preferences: ${preferences}
+
+Return format:
+{
+    "low": {"price": "₹XXK", "description": "Basic description"},
+    "mid": {"price": "₹XXK", "description": "Mid description"},
+    "high": {"price": "₹XXK", "description": "Luxury description"}
+}`
+        }
+    ];
+
+    try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer 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`
+            },
+            body: JSON.stringify({
+                model: "gpt-4-turbo",
+                messages: messages,
+                temperature: 0.7
+            })
+        });
+
+        const result = await response.json();
+        const budgetRanges = JSON.parse(result.choices[0].message.content);
+        displayBudgetSuggestions(budgetRanges);
+    } catch (error) {
+        console.error("Failed to fetch budget suggestions:", error);
+        document.getElementById('budgetSuggestions').innerHTML = '<p class="text-muted">Failed to load budget suggestions</p>';
+    }
+}
+
+function displayBudgetSuggestions(ranges) {
+    const container = document.getElementById('budgetSuggestions');
+    if (!container) return;
+
+    // Extract just the numeric amount from price strings (e.g. "₹50K" -> "50000")
+    const extractAmount = (priceStr) => {
+        const amount = priceStr.replace('₹', '').replace('K', '000');
+        return '₹' + amount;
+    };
+
+    container.innerHTML = `
+        <div class="budget-options">
+            <div class="budget-chip" onclick="document.getElementById('budget').value='${extractAmount(ranges.low.price)}'">
+                <div class="budget-type">Budget</div>
+                <div class="budget-amount">${ranges.low.price}</div>
+                <small>${ranges.low.description}</small>
+            </div>
+            <div class="budget-chip" onclick="document.getElementById('budget').value='${extractAmount(ranges.mid.price)}'">
+                <div class="budget-type">Mid-Range</div>
+                <div class="budget-amount">${ranges.mid.price}</div>
+                <small>${ranges.mid.description}</small>
+            </div>
+            <div class="budget-chip" onclick="document.getElementById('budget').value='${extractAmount(ranges.high.price)}'">
+                <div class="budget-type">Luxury</div>
+                <div class="budget-amount">${ranges.high.price}</div>
+                <small>${ranges.high.description}</small>
+            </div>
+        </div>
+    `;
+}
+
 function showStep(step) {
     document.querySelectorAll('.form-step').forEach((el, index) => {
         el.classList.toggle('d-none', index + 1 !== step);
@@ -119,12 +223,20 @@ function showStep(step) {
         addShimmerChips();
         fetchSuggestions();
     }
+
+    // Add budget suggestions when reaching the budget step
+    if (step === totalSteps) {
+        fetchBudgetSuggestions();
+    }
 }
 
 function nextStep() {
     if (currentStep < totalSteps) {
         currentStep++;
         showStep(currentStep);
+        if (currentStep === totalSteps) {
+            fetchBudgetSuggestions();
+        }
     }
 }
 
@@ -406,3 +518,10 @@ document.addEventListener("keydown", function (event) {
         nextStep();
     }
 });
+
+// Add this function to update hidden input
+function updateHiddenInput() {
+    const chips = Array.from(document.getElementById('preferencesChips').getElementsByClassName('chip'));
+    const values = chips.map(chip => chip.textContent.trim().slice(0, -1)).join(',');
+    document.getElementById('preferences').value = values;
+}

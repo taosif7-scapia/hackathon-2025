@@ -13,3 +13,26 @@ pre {
     white-space: pre-wrap;
     word-wrap: break-word;
 }
+
+.budget-chip {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.budget-chip:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.budget-chip small {
+    color: #6c757d;
+    margin-top: 4px;
+}
