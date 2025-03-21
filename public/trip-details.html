@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .trip-section {
+            margin-bottom: 2rem;
+        }
+        .trip-section h2 {
+            margin-bottom: 1rem;
+        }
+        .trip-section p {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="tripDetails" class="trip-section"></div>
+        <div id="overview" class="trip-section"></div>
+        <div id="dailyItinerary" class="trip-section"></div>
+        <div id="keyExperiences" class="trip-section"></div>
+        <div id="practicalInfo" class="trip-section"></div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            let cookieArr = document.cookie.split(";");
+            for (let i = 0; i < cookieArr.length; i++) {
+                let cookiePair = cookieArr[i].split("=");
+                if (name == cookiePair[0].trim()) {
+                    return decodeURIComponent(cookiePair[1]);
+                }
+            }
+            return null;
+        }
+
+        const tripData = JSON.parse(localStorage.getItem('tripData')); // Get from localStorage
+
+        function renderTripDetails(data) {
+            const tripDetails = document.getElementById('tripDetails');
+            tripDetails.innerHTML = `
+                <h2>Trip Details</h2>
+                <p><strong>Destination:</strong> ${data.tripDetails.destination}</p>
+                <p><strong>Trip Name:</strong> ${data.tripDetails.tripName}</p>
+                <p><strong>Duration:</strong> ${data.tripDetails.duration} days (${data.tripDetails.startDate} to ${data.tripDetails.endDate})</p>
+                <p><strong>Travelers:</strong> ${data.tripDetails.travelers.map(t => `${t.name} (${t.relationship})`).join(', ')}</p>
+                <p><strong>Trip Type:</strong> ${data.tripDetails.tripType}</p>
+                <p><strong>Trip Style:</strong> ${data.tripDetails.tripStyle}</p>
+            `;
+        }
+
+        function renderOverview(data) {
+            const overview = document.getElementById('overview');
+            overview.innerHTML = `
+                <h2>Overview</h2>
+                <p>${data.overview.description}</p>
+                <h3>Weather Info</h3>
+                <p><strong>Season:</strong> ${data.overview.weatherInfo.seasonDescription}</p>
+                <p><strong>Temperature Range:</strong> ${data.overview.weatherInfo.temperatureRange}</p>
+                <p><strong>Climate Notes:</strong> ${data.overview.weatherInfo.climateNotes}</p>
+                <p><strong>Weather Considerations:</strong> ${data.overview.weatherInfo.weatherConsiderations}</p>
+                <h3>Key Highlights</h3>
+                <ul>
+                    ${data.overview.keyHighlights.map(highlight => `<li>${highlight}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        function renderDailyItinerary(data) {
+            const dailyItinerary = document.getElementById('dailyItinerary');
+            dailyItinerary.innerHTML = '<h2>Daily Itinerary</h2>';
+            data.dailyItinerary.forEach(day => {
+                dailyItinerary.innerHTML += `
+                    <div class="day-itinerary">
+                        <h3>Day ${day.day}: ${day.title}</h3>
+                        <p><strong>Location:</strong> ${day.location}</p>
+                        <p>${day.description}</p>
+                        <h4>Activities</h4>
+                        <ul>
+                            ${day.activities.map(activity => `<li>${activity}</li>`).join('')}
+                        </ul>
+                        <h4>Special Highlight</h4>
+                        <p><strong>${day.specialHighlight.title}:</strong> ${day.specialHighlight.description}</p>
+                        <h4>Accommodation Options</h4>
+                        <ul>
+                            ${day.accommodationOptions.map(option => `
+                                <li>
+                                    <strong>${option.name}</strong>: ${option.description}
+                                    <ul>
+                                        ${option.amenities.map(amenity => `<li>${amenity}</li>`).join('')}
+                                    </ul>
+                                    <p><strong>Price Range:</strong> ${option.priceRange}</p>
+                                    <p><strong>Best For:</strong> ${option.bestFor}</p>
+                                </li>
+                            `).join('')}
+                        </ul>
+                        <h4>Food Spots</h4>
+                        <ul>
+                            ${day.foodSpots.map(spot => `
+                                <li>
+                                    <strong>${spot.name}</strong> (${spot.type}): ${spot.specialty}
+                                    <p><strong>Price Range:</strong> ${spot.priceRange}</p>
+                                    <p><strong>Meal Time:</strong> ${spot.mealTime}</p>
+                                    <p><strong>Notes:</strong> ${spot.notes}</p>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+        }
+
+        function renderKeyExperiences(data) {
+            const keyExperiences = document.getElementById('keyExperiences');
+            keyExperiences.innerHTML = '<h2>Key Experiences</h2>';
+            data.keyExperiences.forEach(exp => {
+                keyExperiences.innerHTML += `
+                    <div class="experience">
+                        <h3>${exp.icon} ${exp.title}</h3>
+                        <p><strong>Category:</strong> ${exp.category}</p>
+                        <p>${exp.description}</p>
+                        <h4>Details</h4>
+                        <ul>
+                            ${exp.details.map(detail => `<li><strong>${detail.type}:</strong> ${detail.info}</li>`).join('')}
+                        </ul>
+                        <p><strong>Locations:</strong> ${exp.locations.join(', ')}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderPracticalInfo(data) {
+            const practicalInfo = document.getElementById('practicalInfo');
+            practicalInfo.innerHTML = '<h2>Practical Information</h2>';
+            practicalInfo.innerHTML += `
+                <h3>Transportation</h3>
+                <ul>
+                    ${data.practicalInfo.transportation.map(trans => `<li><strong>${trans.type}:</strong> ${trans.details} (Cost: ${trans.costRange})</li>`).join('')}
+                </ul>
+                <h3>Weather</h3>
+                <ul>
+                    ${data.practicalInfo.weather.map(weather => `<li><strong>${weather.period}:</strong> ${weather.conditions} (Considerations: ${weather.considerations})</li>`).join('')}
+                </ul>
+                <h3>Dining Recommendations</h3>
+                <ul>
+                    ${data.practicalInfo.diningRecommendations.map(dining => `<li><strong>${dining.type}:</strong> ${dining.recommendations} (Notes: ${dining.notes})</li>`).join('')}
+                </ul>
+                <h3>Packing Essentials</h3>
+                <ul>
+                    ${data.practicalInfo.packingEssentials.map(pack => `<li><strong>${pack.category}:</strong> ${pack.items} (Notes: ${pack.notes})</li>`).join('')}
+                </ul>
+                <h3>Local Tips</h3>
+                <ul>
+                    ${data.practicalInfo.localTips.map(tip => `<li><strong>${tip.category}:</strong> ${tip.tip}</li>`).join('')}
+                </ul>
+                <h3>Health and Safety</h3>
+                <ul>
+                    ${data.practicalInfo.healthAndSafety.map(info => `<li><strong>${info.category}:</strong> ${info.information}</li>`).join('')}
+                </ul>
+                <h3>Connectivity</h3>
+                <p><strong>Internet Access:</strong> ${data.practicalInfo.connectivity.internetAccess}</p>
+                <p><strong>Local SIM:</strong> ${data.practicalInfo.connectivity.localSim}</p>
+                <p><strong>Useful Apps:</strong> ${data.practicalInfo.connectivity.usefulApps.join(', ')}</p>
+                <h3>Money Matters</h3>
+                <p><strong>Currency:</strong> ${data.practicalInfo.moneyMatters.currency}</p>
+                <p><strong>Payment Methods:</strong> ${data.practicalInfo.moneyMatters.paymentMethods}</p>
+                <p><strong>Budgeting Tips:</strong> ${data.practicalInfo.moneyMatters.budgetingTips}</p>
+                <p><strong>Tipping:</strong> ${data.practicalInfo.moneyMatters.tipping}</p>
+            `;
+        }
+
+        renderTripDetails(tripData);
+        renderOverview(tripData);
+        renderDailyItinerary(tripData);
+        renderKeyExperiences(tripData);
+        renderPracticalInfo(tripData);
+    </script>
+</body>
+</html>

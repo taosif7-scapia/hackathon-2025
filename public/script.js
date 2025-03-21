@@ -91,13 +91,11 @@ document.getElementById("travelForm").addEventListener("submit", async function 
         });
 
         const result = await response.json();
-        console.log(JSON.parse(result['choices'][0]['message']['content']));
-
-        // Display the response from ChatGPT
-        document.getElementById("jsonOutput").textContent = JSON.stringify(result, null, 2);
+        let tripData = JSON.parse(result['choices'][0]['message']['content']);
+        localStorage.setItem("tripData", JSON.stringify(tripData));
 
         // Redirect after successful submission
-        // window.location.href = "/itinerary";
+        window.location.href = "/trip-details.html";
     } catch (error) {
         console.error("Submission failed:", error);
     }
