@@ -75,7 +75,7 @@ document.getElementById("travelForm").addEventListener("submit", async function 
     ];
 
     const requestBody = {
-        model: "gpt-3.5-turbo", // Change to "gpt-4-turbo" if needed
+        model: "gpt-4-turbo", // Change to "gpt-4-turbo" if needed
         messages: messages,
         temperature: 0.7
     };
