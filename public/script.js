@@ -294,9 +294,11 @@ function initializeChips() {
 document.getElementById("travelForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    // Show loader
+    // Show loader and play music
     document.getElementById('formContainer').classList.add('d-none');
     document.getElementById('loaderContainer').classList.remove('d-none');
+    const music = document.getElementById('loaderMusic');
+    music.play().catch(e => console.log('Audio playback failed:', e));
 
     let messageIndex = 0;
     loaderInterval = setInterval(() => {
@@ -464,7 +466,10 @@ Luxury Travelers: Exclusive experiences, VIP access, premium services.
 Budget Travelers: Free/low-cost activities, money-saving strategies.
 Adventure Seekers: Active experiences, difficulty levels, recovery time.
 Cultural Enthusiasts: Historical sites, immersive experiences, guided tours.
-Please output atleast 3 key experiences, daily itinerary items to match with number of travel da, and 6 practical info items.`
+Please output atleast 3 key experiences, and 6 practical info items.
+Make strictly sure daily itinerary items to match with number of travel days.
+Also mind that today's date and time is ${new Date().toISOString()}
+`
         },
         {
             role: "user",
@@ -507,15 +512,18 @@ Please output atleast 3 key experiences, daily itinerary items to match with num
 
             const apiResult = await apiResponse.json();
             clearInterval(loaderInterval);
+            document.getElementById('loaderMusic').pause(); // Stop music when done
             window.location.href = `/trip-details.html?id=${apiResult.itineraryId}`;
         } catch (error) {
             clearInterval(loaderInterval);
+            document.getElementById('loaderMusic').pause(); // Stop music on error
             console.error("API submission failed:", error);
             document.getElementById('formContainer').classList.remove('d-none');
             document.getElementById('loaderContainer').classList.add('d-none');
         }
     } catch (error) {
         clearInterval(loaderInterval);
+        document.getElementById('loaderMusic').pause(); // Stop music on error
         console.error("OpenAI submission failed:", error);
         document.getElementById('formContainer').classList.remove('d-none');
         document.getElementById('loaderContainer').classList.add('d-none');
