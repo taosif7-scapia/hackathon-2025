@@ -491,15 +491,30 @@ Cultural Enthusiasts: Historical sites, immersive experiences, guided tours.`
         const result = await response.json();
         let tripData = JSON.parse(result['choices'][0]['message']['content']);
         tripData['tripDetails']['heroImage'] = heroImage;
-        localStorage.setItem("tripData", JSON.stringify(tripData));
-
-
-        clearInterval(loaderInterval);
-        window.location.href = "/trip-details.html";
+        
+        // Post to API instead of localStorage
+        try {
+            const apiResponse = await fetch('https://3o9fqxdqy6.execute-api.ap-south-1.amazonaws.com/api/itinerary/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'mode': 'no-cors'
+                },
+                body: JSON.stringify(tripData)
+            });
+            
+            const apiResult = await apiResponse.json();
+            clearInterval(loaderInterval);
+            window.location.href = `/trip-details.html?id=${apiResult.itineraryId}`;
+        } catch (error) {
+            clearInterval(loaderInterval);
+            console.error("API submission failed:", error);
+            document.getElementById('formContainer').classList.remove('d-none');
+            document.getElementById('loaderContainer').classList.add('d-none');
+        }
     } catch (error) {
         clearInterval(loaderInterval);
-        console.error("Submission failed:", error);
-        // Show error message to user
+        console.error("OpenAI submission failed:", error);
         document.getElementById('formContainer').classList.remove('d-none');
         document.getElementById('loaderContainer').classList.add('d-none');
     }

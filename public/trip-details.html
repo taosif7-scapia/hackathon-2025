@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TripMaster | Your Journey Awaits</title>
+    <title>TripIt | Your Journey Awaits</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -240,7 +240,7 @@
         .overview p {
             margin-bottom: 20px;
             font-size: 1.1rem;
-            color: var(--gray-800);
+            color: var (--gray-800);
             line-height: 1.7;
         }
         
@@ -703,7 +703,7 @@
         
         .tip-marker {
             margin-right: 12px;
-            color: var(--secondary);
+            color: var (--secondary);
             flex-shrink: 0;
             margin-top: 3px;
         }
@@ -925,9 +925,46 @@
                 height: 300px;
             }
         }
+        
+        /* Loader styles */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--gray-200);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loader-hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- Add loader overlay -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader"></div>
+    </div>
+    
     <div class="header">
         <div class="header-bg" id="headerBg"></div>
         <div class="header-overlay"></div>
@@ -1294,554 +1331,414 @@
     
     <div class="footer">
         <div class="container">
-            <h2>Your Bali Adventure Awaits</h2>
-            <p>This itinerary was created especially for you by TripMaster. Feel free to customize it to your preferences and share it with your travel companions.</p>
-            <div class="footer-stamp">Created with ♥ by TripMaster</div>
+            <p>This itinerary was created especially for you by TripIt. Feel free to customize it to your preferences and share it with your travel companions.</p>
+            <div class="footer-stamp">Created with ♥ by TripIt</div>
         </div>
     </div>
 
     <script src="https://kit.fontawesome.com/123abc123a.js" crossorigin="anonymous"></script>
     <script>
+        // Initialize trip data variable
+        var tripData;
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Show loader
+            const loaderOverlay = document.getElementById('loaderOverlay');
             
-            // Add page loaded class for animations
-            setTimeout(function() {
-                document.body.classList.add('page-loaded');
-            }, 100);
+            // Get ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const tripId = urlParams.get('id');
             
-            // Function to check if an element is in viewport
-            function isInViewport(element) {
-                const rect = element.getBoundingClientRect();
-                return (
-                    rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85
-                );
+            if (!tripId) {
+                // Handle missing ID
+                alert('No trip ID provided');
+                loaderOverlay.classList.add('loader-hidden');
+                return;
             }
             
-            // Intersection Observer for section animations
-            const sections = document.querySelectorAll('.section');
-            
-            function checkSections() {
-                sections.forEach(section => {
-                    if (isInViewport(section)) {
-                        section.classList.add('visible');
+            // Fetch trip data from API
+            fetch(`https://3o9fqxdqy6.execute-api.ap-south-1.amazonaws.com/api/itinerary/get/${tripId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Hide loader
+                    loaderOverlay.classList.add('loader-hidden');
+                    
+                    // Get trip data from response
+                    tripData = data.iternaryJson;
+                    
+                    if (!tripData) {
+                        throw new Error('Invalid trip data');
                     }
+                    
+                    // Initialize page with trip data
+                    initializePage(tripData);
+                })
+                .catch(error => {
+                    console.error('Error loading trip data:', error);
+                    alert('Failed to load trip data');
+                    loaderOverlay.classList.add('loader-hidden');
                 });
-            }
             
-            // Check sections on load
-            checkSections();
-            
-            // Check sections on scroll
-            window.addEventListener('scroll', checkSections);
-            
-            // Demo data - this will be used if localStorage is not available
-            const demoTripData = {
-                tripDetails: {
-                    destination: "Bali, Indonesia",
-                    tripName: "Island Adventure & Cultural Immersion",
-                    startDate: "2025-04-15",
-                    endDate: "2025-04-28",
-                    duration: 14,
-                    travelers: [
-                        {name: "Alex", relationship: "You"},
-                        {name: "Jordan", relationship: "Partner"},
-                        {name: "Taylor", relationship: "Friend"},
-                        {name: "Casey", relationship: "Friend"}
-                    ],
-                    tripType: "Beach/Cultural",
-                    tripStyle: "Balanced pace with mix of relaxation and adventure"
-                },
-                overview: {
-                    description: "Immerse yourself in the exotic paradise of Bali, where ancient temples meet pristine beaches and lush jungles. This carefully crafted two-week journey balances relaxation with adventure, cultural experiences with natural wonders, and traditional Balinese hospitality with modern comforts.",
-                    weatherInfo: {
-                        seasonDescription: "Mostly Sunny",
-                        temperatureRange: "24-32°C",
-                        climateNotes: "70% Humidity",
-                        weatherConsiderations: "Brief afternoon showers possible"
-                    },
-                    keyHighlights: [
-                        "Pristine beaches",
-                        "Rice terraces",
-                        "Ancient temples",
-                        "Yoga retreats",
-                        "Volcano trekking",
-                        "World-class surfing"
-                    ]
-                },
-                dailyItinerary: [
-                    {
-                        day: 1,
-                        title: "Arrival in Paradise",
-                        location: "Seminyak, Bali",
-                        locationMapUrl: "#",
-                        transportation: {
-                            mode: "Private airport transfer",
-                            duration: "30 minutes",
-                            distance: "12 km",
-                            notes: "Air-conditioned vehicle"
-                        },
-                        description: "Welcome to the Island of the Gods! After your arrival at Ngurah Rai International Airport, a private driver will whisk you away to your accommodations in stylish Seminyak. The remainder of the day is designed for relaxation as you ease into Bali time and recover from your journey.",
-                        activities: [
-                            "Arrive at Ngurah Rai International Airport",
-                            "Private transfer to your accommodation in Seminyak",
-                            "Check-in and refresh after your journey",
-                            "Evening sunset stroll along Seminyak Beach",
-                            "Welcome dinner at a beachfront restaurant"
-                        ],
-                        specialHighlight: {
-                            title: "Special Experience",
-                            description: "End your first day with a magical sunset dinner at La Lucciola, where you'll dine with your toes in the sand while watching the sun dip below the horizon, painting the sky in vibrant hues of orange and pink – the perfect introduction to Bali's legendary sunsets."
-                        },
-                        accommodationOptions: [
-                            {
-                                name: "W Bali - Seminyak",
-                                description: "Ultra-stylish beachfront resort featuring bold design, stunning infinity pools, and world-class dining.",
-                                amenities: ["Beachfront", "Pool Villa", "Spa", "Multiple Restaurants"],
-                                priceRange: "$350-450/night",
-                                bestFor: "Luxury travelers"
-                            },
-                            {
-                                name: "The Colony Hotel",
-                                description: "Boutique colonial-style hotel with elegant rooms surrounding a central pool, walking distance to beach and restaurants.",
-                                amenities: ["Central Location", "Breakfast Included", "Colonial Charm", "Pool"],
-                                priceRange: "$120-180/night",
-                                bestFor: "Mid-range travelers"
-                            }
-                        ]
-                    },
-                    {
-                        day: 2,
-                        title: "Beach Life & Shopping",
-                        location: "Seminyak, Bali",
-                        locationMapUrl: "#",
-                        description: "Today is all about embracing Seminyak's laid-back beach lifestyle and vibrant shopping scene. After breakfast, head to the famous beach clubs, explore the stylish boutiques, and indulge in Seminyak's renowned culinary offerings.",
-                        activities: [
-                            "Morning yoga session on the beach (optional)",
-                            "Leisurely breakfast at your accommodation",
-                            "Beach time at Seminyak Beach",
-                            "Lunch at a trendy beach club",
-                            "Afternoon shopping on Jalan Kayu Aya (Eat Street)",
-                            "Sunset cocktails at Potato Head Beach Club",
-                            "Dinner at one of Seminyak's acclaimed restaurants"
-                        ],
-                        specialHighlight: {
-                            title: "Local Insight",
-                            description: "For the best shopping experience, venture beyond the main streets to find hidden boutiques showcasing work from local designers. Jalan Raya Seminyak and the side streets off Jalan Kayu Aya offer unique finds that you won't see back home."
+            // Function to initialize page with trip data
+            function initializePage(tripData) {
+                // Add page loaded class for animations
+                setTimeout(function() {
+                    document.body.classList.add('page-loaded');
+                }, 100);
+                
+                // Function to check if an element is in viewport
+                function isInViewport(element) {
+                    const rect = element.getBoundingClientRect();
+                    return (
+                        rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.85
+                    );
+                }
+                
+                // Function to check and animate sections
+                function checkSections() {
+                    const sections = document.querySelectorAll('.section');
+                    sections.forEach(section => {
+                        section.classList.add('visible');
+                    });
+                }
+                
+                // Check sections initially
+                checkSections();
+                
+                // use tripData to populate the page
+                if (tripData) {
+                    // Populate data based on tripData JSON structure
+                    if (tripData.tripDetails) {
+
+                        // Set header background
+                        document.getElementById('headerBg').style.backgroundImage = 'url('+(tripData.tripDetails.heroImage || 'https://source.unsplash.com/1600x900/?beach')+')'; 
+                
+
+                        document.getElementById('destinationTitle').textContent = tripData.tripDetails.destination || 'Bali Paradise';
+                        document.getElementById('tripName').textContent = tripData.tripDetails.tripName || 'Island Adventure & Cultural Immersion';
+                        
+                        // Format dates
+                        if (tripData.tripDetails.startDate && tripData.tripDetails.endDate) {
+                            const startDate = new Date(tripData.tripDetails.startDate);
+                            const endDate = new Date(tripData.tripDetails.endDate);
+                            
+                            const options = { month: 'long', day: 'numeric' };
+                            const formattedStart = startDate.toLocaleDateString('en-US', options);
+                            const formattedEnd = endDate.toLocaleDateString('en-US', options);
+                            const year = startDate.getFullYear();
+                            
+                            document.getElementById('tripDates').textContent = `${formattedStart} - ${formattedEnd}, ${year}`;
                         }
                     }
-                ],
-                keyExperiences: [
-                    {
-                        title: "Sacred Monkey Forest",
-                        icon: "🐒",
-                        category: "Nature/Culture",
-                        description: "Walk through this enchanting forest sanctuary home to over 700 Balinese long-tailed macaques. The forest contains ancient temples and is considered a sacred spiritual center by locals.",
-                        details: [
-                            {type: "Best Time", info: "Early morning (8-10am) or late afternoon (3-5pm)"},
-                            {type: "Duration", info: "1-2 hours"},
-                            {type: "Cost", info: "80,000 IDR (~$5 USD) per adult"},
-                            {type: "Tips", info: "Don't bring food or plastic bags. Remove sunglasses and dangling jewelry. Don't stare directly at monkeys as they may perceive it as a challenge."}
-                        ],
-                        locations: ["Ubud"]
-                    },
-                    {
-                        title: "Mount Batur Sunrise Hike",
-                        icon: "🌋",
-                        category: "Adventure",
-                        description: "Embark on an early morning trek up an active volcano to witness one of Bali's most magical experiences - sunrise from the summit of Mount Batur, with panoramic views across Lake Batur and neighboring Mount Agung.",
-                        details: [
-                            {type: "Best Time", info: "Start at 2:30am to reach summit by sunrise (5:45-6:15am)"},
-                            {type: "Duration", info: "6-7 hours (2-3 hours up, 1.5-2 hours down, plus time at summit)"},
-                            {type: "Cost", info: "500,000-700,000 IDR (~$35-45 USD) per person"},
-                            {type: "Tips", info: "Wear layers (it's cold before sunrise), sturdy shoes, and bring a headlamp. The trek is moderate difficulty but achievable for most fitness levels."}
-                        ],
-                        locations: ["Kintamani"]
-                    },
-                    {
-                        title: "Traditional Balinese Cooking Class",
-                        icon: "🍲",
-                        category: "Culture/Food",
-                        description: "Learn the secrets of authentic Balinese cuisine in this hands-on culinary adventure. Visit local markets to select fresh ingredients, then prepare traditional dishes under the guidance of expert local chefs.",
-                        details: [
-                            {type: "Best Time", info: "Morning classes (8am-1pm) include market visits"},
-                            {type: "Duration", info: "4-6 hours"},
-                            {type: "Cost", info: "400,000-600,000 IDR (~$25-40 USD) per person"},
-                            {type: "Booking", info: "Reserve 1-2 days in advance, especially in high season"}
-                        ],
-                        locations: ["Ubud", "Seminyak"]
-                    }
-                ],
-                practicalInfo: {
-                    transportation: [
-                        {details: "Private drivers are the most comfortable option for longer journeys (400-600k IDR/day)."},
-                        {details: "Ride-hailing apps (Gojek, Grab) work well in tourist areas but are banned in some locations."},
-                        {details: "Scooter rentals cost 60-80k IDR/day, but require international driving permit and experience."}
-                    ],
-                    packingEssentials: [
-                        {items: "Light, breathable clothing (cotton or linen)"},
-                        {items: "Modest clothing for temple visits (shoulders and knees covered)"},
-                        {items: "High SPF sunscreen, insect repellent, and rain jacket/umbrella"},
-                        {items: "Portable water bottle with filter (tap water isn't potable)"}
-                    ],
-                    moneyMatters: {
-                        currency: "Indonesian Rupiah (IDR)",
-                        paymentMethods: "ATMs widely available in tourist areas, credit cards accepted at upscale establishments but carry cash for smaller vendors",
-                        tipping: "Not required but appreciated (10% for good service)"
-                    },
-                    connectivity: {
-                        internetAccess: "Most accommodations and cafes offer free WiFi",
-                        localSim: "Local SIM cards available at airport (Telkomsel recommended for coverage)",
-                        usefulApps: ["Gojek", "WhatsApp", "Maps.me"]
-                    }
-                }
-            };
-                
-            // Initialize trip data variable
-            let tripData;
-            
-            // Attempt to load trip data from localStorage or use default data
-            try {
-                // Try to get data from localStorage
-                const storedData = localStorage.getItem('tripData');
-                if (storedData) {
-                    tripData = JSON.parse(storedData);
-                } else {
-                    // If no localStorage data, use demo data
-                    tripData = demoTripData;
-                }
-            } catch (error) {
-                // If there's any error (like SecurityError in sandboxed environments),
-                // fallback to demo data
-                console.log('Using demo trip data instead of localStorage');
-                tripData = demoTripData;
-            }
-            
-            // Now use tripData to populate the page
-            if (tripData) {
-                // Populate data based on tripData JSON structure
-                if (tripData.tripDetails) {
-
-                    // Set header background
-                    document.getElementById('headerBg').style.backgroundImage = 'url('+(tripData.tripDetails.heroImage || 'https://source.unsplash.com/1600x900/?beach')+')'; 
-            
-
-                    document.getElementById('destinationTitle').textContent = tripData.tripDetails.destination || 'Bali Paradise';
-                    document.getElementById('tripName').textContent = tripData.tripDetails.tripName || 'Island Adventure & Cultural Immersion';
                     
-                    // Format dates
-                    if (tripData.tripDetails.startDate && tripData.tripDetails.endDate) {
-                        const startDate = new Date(tripData.tripDetails.startDate);
-                        const endDate = new Date(tripData.tripDetails.endDate);
-                        
-                        const options = { month: 'long', day: 'numeric' };
-                        const formattedStart = startDate.toLocaleDateString('en-US', options);
-                        const formattedEnd = endDate.toLocaleDateString('en-US', options);
-                        const year = startDate.getFullYear();
-                        
-                        document.getElementById('tripDates').textContent = `${formattedStart} - ${formattedEnd}, ${year}`;
-                    }
-                }
-                
-                // Populate overview section
-                if (tripData.overview) {
-                    const overviewSection = document.getElementById('overview');
-                    overviewSection.innerHTML = `
-                        <div class="overview-line"></div>
-                        <h2>Trip Overview</h2>
-                        <p>${tripData.overview.description || 'Your custom trip description will appear here.'}</p>
-                    `;
-                    
-                    // Add weather info if available
-                    if (tripData.overview.weatherInfo) {
-                        const weatherWidget = document.getElementById('weatherWidget');
-                        weatherWidget.innerHTML = `
-                            <div class="weather-item"><i class="fa-solid fa-temperature-half"></i> ${tripData.overview.weatherInfo.temperatureRange || '24-32°C'}</div>
-                            <div class="weather-item"><i class="fa-solid fa-cloud-sun"></i> ${tripData.overview.weatherInfo.seasonDescription || 'Mostly Sunny'}</div>
-                            <div class="weather-item"><i class="fa-solid fa-droplet"></i> ${tripData.overview.weatherInfo.climateNotes || '70% Humidity'}</div>
-                        `;
-                    }
-                    
-                    // Add highlights if available
-                    if (tripData.overview.keyHighlights && tripData.overview.keyHighlights.length) {
-                        const highlightsContainer = document.createElement('div');
-                        highlightsContainer.className = 'highlights';
-                        
-                        tripData.overview.keyHighlights.forEach(highlight => {
-                            const highlightDiv = document.createElement('div');
-                            highlightDiv.className = 'highlight';
-                            highlightDiv.innerHTML = `<span class="highlight-icon">✨</span> ${highlight}`;
-                            highlightsContainer.appendChild(highlightDiv);
-                        });
-                        
-                        overviewSection.appendChild(highlightsContainer);
-                    }
-                }
-                
-                // Populate daily itinerary
-                if (tripData.dailyItinerary && tripData.dailyItinerary.length) {
-                    const itineraryContainer = document.getElementById('dailyItinerary');
-                    itineraryContainer.innerHTML = '<h2 class="section-title">Daily Itinerary</h2>';
-                    
-                    tripData.dailyItinerary.forEach(day => {
-                        const dayCard = document.createElement('div');
-                        dayCard.className = 'day-card';
-                        
-                        // Create day header
-                        const dayHeader = document.createElement('div');
-                        dayHeader.className = 'day-header';
-                        dayHeader.innerHTML = `
-                            <div class="day-number">${day.day || '1'}</div>
-                            <div class="day-title">
-                                <h3>${day.title || 'Day Title'}</h3>
-                                <div class="location"><i class="fa-solid fa-location-dot"></i> ${day.location || 'Location'} <a href="${day.locationMapUrl || '#'}" target="_blank">View on map</a></div>
-                            </div>
+                    // Populate overview section
+                    if (tripData.overview) {
+                        const overviewSection = document.getElementById('overview');
+                        overviewSection.innerHTML = `
+                            <div class="overview-line"></div>
+                            <h2>Trip Overview</h2>
+                            <p>${tripData.overview.description || 'Your custom trip description will appear here.'}</p>
                         `;
                         
-                        // Create day content
-                        const dayContent = document.createElement('div');
-                        dayContent.className = 'day-content';
-                        
-                        // Add transportation info if available
-                        if (day.transportation) {
-                            dayContent.innerHTML += `
-                                <div class="commute-info"><i class="fa-solid fa-car"></i> ${day.transportation.mode || 'Transfer'} (${day.transportation.duration || 'N/A'}, ${day.transportation.distance || 'N/A'})</div>
+                        // Add weather info if available
+                        if (tripData.overview.weatherInfo) {
+                            const weatherWidget = document.getElementById('weatherWidget');
+                            weatherWidget.innerHTML = `
+                                <div class="weather-item"><i class="fa-solid fa-temperature-half"></i> ${tripData.overview.weatherInfo.temperatureRange || '24-32°C'}</div>
+                                <div class="weather-item"><i class="fa-solid fa-cloud-sun"></i> ${tripData.overview.weatherInfo.seasonDescription || 'Mostly Sunny'}</div>
+                                <div class="weather-item"><i class="fa-solid fa-droplet"></i> ${tripData.overview.weatherInfo.climateNotes || '70% Humidity'}</div>
                             `;
                         }
                         
-                        // Add day description
-                        dayContent.innerHTML += `<p>${day.description || 'Day description will appear here.'}</p>`;
-                        
-                        // Add activities if available
-                        if (day.activities && day.activities.length) {
-                            const activityList = document.createElement('ul');
-                            activityList.className = 'activity-list';
+                        // Add highlights if available
+                        if (tripData.overview.keyHighlights && tripData.overview.keyHighlights.length) {
+                            const highlightsContainer = document.createElement('div');
+                            highlightsContainer.className = 'highlights';
                             
-                            day.activities.forEach(activity => {
-                                const activityItem = document.createElement('li');
-                                activityItem.textContent = activity;
-                                activityList.appendChild(activityItem);
+                            tripData.overview.keyHighlights.forEach(highlight => {
+                                const highlightDiv = document.createElement('div');
+                                highlightDiv.className = 'highlight';
+                                highlightDiv.innerHTML = `<span class="highlight-icon">✨</span> ${highlight}`;
+                                highlightsContainer.appendChild(highlightDiv);
                             });
                             
-                            dayContent.appendChild(activityList);
+                            overviewSection.appendChild(highlightsContainer);
                         }
+                    }
+                    
+                    // Populate daily itinerary
+                    if (tripData.dailyItinerary && tripData.dailyItinerary.length) {
+                        const itineraryContainer = document.getElementById('dailyItinerary');
+                        itineraryContainer.innerHTML = '<h2 class="section-title">Daily Itinerary</h2>';
                         
-                        // Add special highlight if available
-                        if (day.specialHighlight) {
-                            dayContent.innerHTML += `
-                                <div class="special-box">
-                                    <div class="special-title"><i class="fa-solid fa-star"></i> ${day.specialHighlight.title || 'Special Experience'}</div>
-                                    <p>${day.specialHighlight.description || 'Special experience description will appear here.'}</p>
+                        tripData.dailyItinerary.forEach(day => {
+                            const dayCard = document.createElement('div');
+                            dayCard.className = 'day-card';
+                            
+                            // Create day header
+                            const dayHeader = document.createElement('div');
+                            dayHeader.className = 'day-header';
+                            dayHeader.innerHTML = `
+                                <div class="day-number">${day.day || '1'}</div>
+                                <div class="day-title">
+                                    <h3>${day.title || 'Day Title'}</h3>
+                                    <div class="location"><i class="fa-solid fa-location-dot"></i> ${day.location || 'Location'} <a href="${day.locationMapUrl || '#'}" target="_blank">View on map</a></div>
                                 </div>
                             `;
-                        }
-                        
-                        // Add accommodation options if available
-                        if (day.accommodationOptions && day.accommodationOptions.length) {
-                            dayContent.innerHTML += `<h4 class="day-section-title">Where to Stay</h4>`;
                             
-                            const stayOptions = document.createElement('div');
-                            stayOptions.className = 'stay-options';
+                            // Create day content
+                            const dayContent = document.createElement('div');
+                            dayContent.className = 'day-content';
                             
-                            day.accommodationOptions.forEach((option, index) => {
-                                const optionDiv = document.createElement('div');
-                                optionDiv.className = 'stay-option';
-                                
-                                // Determine label based on index
-                                let label;
-                                if (index === 0) label = 'Luxury';
-                                else if (index === 1) label = 'Mid-Range';
-                                else label = 'Budget';
-                                
-                                optionDiv.innerHTML = `
-                                    <div class="option-label">${label}</div>
-                                    <h4>${option.name || 'Accommodation Name'}</h4>
-                                    <p>${option.description || 'Accommodation description will appear here.'}</p>
-                                    <div class="price-range">${option.priceRange || 'Price range'}</div>
+                            // Add transportation info if available
+                            if (day.transportation) {
+                                dayContent.innerHTML += `
+                                    <div class="commute-info"><i class="fa-solid fa-car"></i> ${day.transportation.mode || 'Transfer'} (${day.transportation.duration || 'N/A'}, ${day.transportation.distance || 'N/A'})</div>
                                 `;
-                                
-                                // Add amenities as tags if available
-                                if (option.amenities && option.amenities.length) {
-                                    const tagsContainer = document.createElement('div');
-                                    tagsContainer.className = 'tags-container';
-                                    
-                                    const tagColors = ['blue', 'orange', 'green', 'red'];
-                                    option.amenities.forEach((amenity, i) => {
-                                        const tagSpan = document.createElement('span');
-                                        tagSpan.className = `tag ${tagColors[i % tagColors.length]}`;
-                                        tagSpan.textContent = amenity;
-                                        tagsContainer.appendChild(tagSpan);
-                                    });
-                                    
-                                    optionDiv.appendChild(tagsContainer);
-                                }
-                                
-                                stayOptions.appendChild(optionDiv);
-                            });
+                            }
                             
-                            dayContent.appendChild(stayOptions);
-                        }
-                        
-                        // Append header and content to the day card
-                        dayCard.appendChild(dayHeader);
-                        dayCard.appendChild(dayContent);
-                        
-                        // Append the day card to the itinerary container
-                        itineraryContainer.appendChild(dayCard);
-                    });
-                }
-                
-                // Populate key experiences
-                if (tripData.keyExperiences && tripData.keyExperiences.length) {
-                    const experiencesGrid = document.getElementById('keyExperiences');
-                    experiencesGrid.innerHTML = '';
-                    
-                    tripData.keyExperiences.forEach(experience => {
-                        const card = document.createElement('div');
-                        card.className = 'experience-card';
-                        
-                        // Create card header
-                        const cardHeader = document.createElement('div');
-                        cardHeader.className = 'card-header';
-                        cardHeader.innerHTML = `
-                            <h3>${experience.title || 'Experience Title'}</h3>
-                            <div class="exp-icon">${experience.icon || '✨'}</div>
-                        `;
-                        
-                        // Create card content
-                        const cardContent = document.createElement('div');
-                        cardContent.className = 'card-content';
-                        cardContent.innerHTML = `<p>${experience.description || 'Experience description will appear here.'}</p>`;
-                        
-                        // Add details if available
-                        if (experience.details && experience.details.length) {
-                            const detailList = document.createElement('div');
-                            detailList.className = 'detail-list';
+                            // Add day description
+                            dayContent.innerHTML += `<p>${day.description || 'Day description will appear here.'}</p>`;
                             
-                            experience.details.forEach(detail => {
-                                const detailItem = document.createElement('div');
-                                detailItem.className = 'detail-item';
+                            // Add activities if available
+                            if (day.activities && day.activities.length) {
+                                const activityList = document.createElement('ul');
+                                activityList.className = 'activity-list';
                                 
-                                // Choose icon based on detail type
-                                let icon;
-                                switch (detail.type.toLowerCase()) {
-                                    case 'best time':
-                                        icon = 'fa-regular fa-clock';
-                                        break;
-                                    case 'duration':
-                                        icon = 'fa-solid fa-hourglass-half';
-                                        break;
-                                    case 'cost':
-                                        icon = 'fa-solid fa-dollar-sign';
-                                        break;
-                                    case 'booking':
-                                        icon = 'fa-solid fa-bookmark';
-                                        break;
-                                    case 'tips':
-                                        icon = 'fa-solid fa-lightbulb';
-                                        break;
-                                    default:
-                                        icon = 'fa-solid fa-circle-info';
-                                }
+                                day.activities.forEach(activity => {
+                                    const activityItem = document.createElement('li');
+                                    activityItem.textContent = activity;
+                                    activityList.appendChild(activityItem);
+                                });
                                 
-                                detailItem.innerHTML = `
-                                    <div class="detail-icon"><i class="${icon}"></i></div>
-                                    <div class="detail-content">
-                                        <div class="detail-type">${detail.type || 'Detail'}</div>
-                                        <div>${detail.info || 'Information will appear here.'}</div>
+                                dayContent.appendChild(activityList);
+                            }
+                            
+                            // Add special highlight if available
+                            if (day.specialHighlight) {
+                                dayContent.innerHTML += `
+                                    <div class="special-box">
+                                        <div class="special-title"><i class="fa-solid fa-star"></i> ${day.specialHighlight.title || 'Special Experience'}</div>
+                                        <p>${day.specialHighlight.description || 'Special experience description will appear here.'}</p>
                                     </div>
                                 `;
+                            }
+                            
+                            // Add accommodation options if available
+                            if (day.accommodationOptions && day.accommodationOptions.length) {
+                                dayContent.innerHTML += `<h4 class="day-section-title">Where to Stay</h4>`;
                                 
-                                detailList.appendChild(detailItem);
+                                const stayOptions = document.createElement('div');
+                                stayOptions.className = 'stay-options';
+                                
+                                day.accommodationOptions.forEach((option, index) => {
+                                    const optionDiv = document.createElement('div');
+                                    optionDiv.className = 'stay-option';
+                                    
+                                    // Determine label based on index
+                                    let label;
+                                    if (index === 0) label = 'Luxury';
+                                    else if (index === 1) label = 'Mid-Range';
+                                    else label = 'Budget';
+                                    
+                                    optionDiv.innerHTML = `
+                                        <div class="option-label">${label}</div>
+                                        <h4>${option.name || 'Accommodation Name'}</h4>
+                                        <p>${option.description || 'Accommodation description will appear here.'}</p>
+                                        <div class="price-range">${option.priceRange || 'Price range'}</div>
+                                    `;
+                                    
+                                    // Add amenities as tags if available
+                                    if (option.amenities && option.amenities.length) {
+                                        const tagsContainer = document.createElement('div');
+                                        tagsContainer.className = 'tags-container';
+                                        
+                                        const tagColors = ['blue', 'orange', 'green', 'red'];
+                                        option.amenities.forEach((amenity, i) => {
+                                            const tagSpan = document.createElement('span');
+                                            tagSpan.className = `tag ${tagColors[i % tagColors.length]}`;
+                                            tagSpan.textContent = amenity;
+                                            tagsContainer.appendChild(tagSpan);
+                                        });
+                                        
+                                        optionDiv.appendChild(tagsContainer);
+                                    }
+                                    
+                                    stayOptions.appendChild(optionDiv);
+                                });
+                                
+                                dayContent.appendChild(stayOptions);
+                            }
+                            
+                            // Append header and content to the day card
+                            dayCard.appendChild(dayHeader);
+                            dayCard.appendChild(dayContent);
+                            
+                            // Append the day card to the itinerary container
+                            itineraryContainer.appendChild(dayCard);
+                        });
+                    }
+                    
+                    // Populate key experiences
+                    if (tripData.keyExperiences && tripData.keyExperiences.length) {
+                        const experiencesGrid = document.getElementById('keyExperiences');
+                        experiencesGrid.innerHTML = '';
+                        
+                        tripData.keyExperiences.forEach(experience => {
+                            const card = document.createElement('div');
+                            card.className = 'experience-card';
+                            
+                            // Create card header
+                            const cardHeader = document.createElement('div');
+                            cardHeader.className = 'card-header';
+                            cardHeader.innerHTML = `
+                                <h3>${experience.title || 'Experience Title'}</h3>
+                                <div class="exp-icon">${experience.icon || '✨'}</div>
+                            `;
+                            
+                            // Create card content
+                            const cardContent = document.createElement('div');
+                            cardContent.className = 'card-content';
+                            cardContent.innerHTML = `<p>${experience.description || 'Experience description will appear here.'}</p>`;
+                            
+                            // Add details if available
+                            if (experience.details && experience.details.length) {
+                                const detailList = document.createElement('div');
+                                detailList.className = 'detail-list';
+                                
+                                experience.details.forEach(detail => {
+                                    const detailItem = document.createElement('div');
+                                    detailItem.className = 'detail-item';
+                                    
+                                    // Choose icon based on detail type
+                                    let icon;
+                                    switch (detail.type.toLowerCase()) {
+                                        case 'best time':
+                                            icon = 'fa-regular fa-clock';
+                                            break;
+                                        case 'duration':
+                                            icon = 'fa-solid fa-hourglass-half';
+                                            break;
+                                        case 'cost':
+                                            icon = 'fa-solid fa-dollar-sign';
+                                            break;
+                                        case 'booking':
+                                            icon = 'fa-solid fa-bookmark';
+                                            break;
+                                        case 'tips':
+                                            icon = 'fa-solid fa-lightbulb';
+                                            break;
+                                        default:
+                                            icon = 'fa-solid fa-circle-info';
+                                    }
+                                    
+                                    detailItem.innerHTML = `
+                                        <div class="detail-icon"><i class="${icon}"></i></div>
+                                        <div class="detail-content">
+                                            <div class="detail-type">${detail.type || 'Detail'}</div>
+                                            <div>${detail.info || 'Information will appear here.'}</div>
+                                        </div>
+                                    `;
+                                    
+                                    detailList.appendChild(detailItem);
+                                });
+                                
+                                cardContent.appendChild(detailList);
+                            }
+                            
+                            // Append header and content to the card
+                            card.appendChild(cardHeader);
+                            card.appendChild(cardContent);
+                            
+                            // Append the card to the experiences grid
+                            experiencesGrid.appendChild(card);
+                        });
+                    }
+                    
+                    // Populate practical information
+                    if (tripData.practicalInfo) {
+                        const practicalInfo = document.getElementById('practicalInfo');
+                        practicalInfo.innerHTML = '<h2 class="section-title">Practical Information</h2>';
+                        
+                        const tipsGrid = document.createElement('div');
+                        tipsGrid.className = 'tips-grid';
+                        
+                        // Function to create a tip card
+                        function createTipCard(title, icon, items) {
+                            const card = document.createElement('div');
+                            card.className = 'tip-card';
+                            
+                            const cardHeader = document.createElement('div');
+                            cardHeader.className = 'tip-header';
+                            cardHeader.innerHTML = `<div class="tip-icon"><i class="${icon}"></i></div>${title}`;
+                            
+                            const cardContent = document.createElement('div');
+                            cardContent.className = 'tip-content';
+                            
+                            const tipList = document.createElement('ul');
+                            tipList.className = 'tip-list';
+                            
+                            items.forEach(item => {
+                                const li = document.createElement('li');
+                                li.innerHTML = `
+                                    <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
+                                    <div>${typeof item === 'string' ? item : (item.tip || item.information || item.details || item.items || 'Information')}</div>
+                                `;
+                                tipList.appendChild(li);
                             });
                             
-                            cardContent.appendChild(detailList);
+                            cardContent.appendChild(tipList);
+                            card.appendChild(cardHeader);
+                            card.appendChild(cardContent);
+                            
+                            return card;
                         }
                         
-                        // Append header and content to the card
-                        card.appendChild(cardHeader);
-                        card.appendChild(cardContent);
-                        
-                        // Append the card to the experiences grid
-                        experiencesGrid.appendChild(card);
-                    });
-                }
-                
-                // Populate practical information
-                if (tripData.practicalInfo) {
-                    const practicalInfo = document.getElementById('practicalInfo');
-                    practicalInfo.innerHTML = '<h2 class="section-title">Practical Information</h2>';
-                    
-                    const tipsGrid = document.createElement('div');
-                    tipsGrid.className = 'tips-grid';
-                    
-                    // Function to create a tip card
-                    function createTipCard(title, icon, items) {
-                        const card = document.createElement('div');
-                        card.className = 'tip-card';
-                        
-                        const cardHeader = document.createElement('div');
-                        cardHeader.className = 'tip-header';
-                        cardHeader.innerHTML = `<div class="tip-icon"><i class="${icon}"></i></div>${title}`;
-                        
-                        const cardContent = document.createElement('div');
-                        cardContent.className = 'tip-content';
-                        
-                        const tipList = document.createElement('ul');
-                        tipList.className = 'tip-list';
-                        
-                        items.forEach(item => {
-                            const li = document.createElement('li');
-                            li.innerHTML = `
-                                <div class="tip-marker"><i class="fa-solid fa-check"></i></div>
-                                <div>${typeof item === 'string' ? item : (item.tip || item.information || item.details || item.items || 'Information')}</div>
-                            `;
-                            tipList.appendChild(li);
-                        });
-                        
-                        cardContent.appendChild(tipList);
-                        card.appendChild(cardHeader);
-                        card.appendChild(cardContent);
-                        
-                        return card;
-                    }
-                    
-                    // Add transportation tips
-                    if (tripData.practicalInfo.transportation && tripData.practicalInfo.transportation.length) {
-                        tipsGrid.appendChild(createTipCard('Transportation', 'fa-solid fa-plane-departure', tripData.practicalInfo.transportation));
-                    }
-                    
-                    // Add packing essentials
-                    if (tripData.practicalInfo.packingEssentials && tripData.practicalInfo.packingEssentials.length) {
-                        tipsGrid.appendChild(createTipCard('Packing Essentials', 'fa-solid fa-suitcase', tripData.practicalInfo.packingEssentials));
-                    }
-                    
-                    // Add money matters
-                    if (tripData.practicalInfo.moneyMatters) {
-                        const moneyItems = [
-                            `Currency: ${tripData.practicalInfo.moneyMatters.currency || 'Local currency'}`,
-                            `Payment: ${tripData.practicalInfo.moneyMatters.paymentMethods || 'Common payment methods'}`,
-                            `Tipping: ${tripData.practicalInfo.moneyMatters.tipping || 'Tipping customs'}`
-                        ];
-                        tipsGrid.appendChild(createTipCard('Money Matters', 'fa-solid fa-wallet', moneyItems));
-                    }
-                    
-                    // Add connectivity info
-                    if (tripData.practicalInfo.connectivity) {
-                        const connectivityItems = [
-                            `Internet: ${tripData.practicalInfo.connectivity.internetAccess || 'WiFi information'}`,
-                            `Local SIM: ${tripData.practicalInfo.connectivity.localSim || 'SIM card information'}`
-                        ];
-                        
-                        if (tripData.practicalInfo.connectivity.usefulApps && tripData.practicalInfo.connectivity.usefulApps.length) {
-                            connectivityItems.push(`Useful Apps: ${tripData.practicalInfo.connectivity.usefulApps.join(', ')}`);
+                        // Add transportation tips
+                        if (tripData.practicalInfo.transportation && tripData.practicalInfo.transportation.length) {
+                            tipsGrid.appendChild(createTipCard('Transportation', 'fa-solid fa-plane-departure', tripData.practicalInfo.transportation));
                         }
                         
-                        tipsGrid.appendChild(createTipCard('Connectivity', 'fa-solid fa-wifi', connectivityItems));
+                        // Add packing essentials
+                        if (tripData.practicalInfo.packingEssentials && tripData.practicalInfo.packingEssentials.length) {
+                            tipsGrid.appendChild(createTipCard('Packing Essentials', 'fa-solid fa-suitcase', tripData.practicalInfo.packingEssentials));
+                        }
+                        
+                        // Add money matters
+                        if (tripData.practicalInfo.moneyMatters) {
+                            const moneyItems = [
+                                `Currency: ${tripData.practicalInfo.moneyMatters.currency || 'Local currency'}`,
+                                `Payment: ${tripData.practicalInfo.moneyMatters.paymentMethods || 'Common payment methods'}`,
+                                `Tipping: ${tripData.practicalInfo.moneyMatters.tipping || 'Tipping customs'}`
+                            ];
+                            tipsGrid.appendChild(createTipCard('Money Matters', 'fa-solid fa-wallet', moneyItems));
+                        }
+                        
+                        // Add connectivity info
+                        if (tripData.practicalInfo.connectivity) {
+                            const connectivityItems = [
+                                `Internet: ${tripData.practicalInfo.connectivity.internetAccess || 'WiFi information'}`,
+                                `Local SIM: ${tripData.practicalInfo.connectivity.localSim || 'SIM card information'}`
+                            ];
+                            
+                            if (tripData.practicalInfo.connectivity.usefulApps && tripData.practicalInfo.connectivity.usefulApps.length) {
+                                connectivityItems.push(`Useful Apps: ${tripData.practicalInfo.connectivity.usefulApps.join(', ')}`);
+                            }
+                            
+                            tipsGrid.appendChild(createTipCard('Connectivity', 'fa-solid fa-wifi', connectivityItems));
+                        }
+                        
+                        practicalInfo.appendChild(tipsGrid);
                     }
-                    
-                    practicalInfo.appendChild(tipsGrid);
                 }
             }
+            
+            // Check sections on scroll
+            window.addEventListener('scroll', function() {
+                if (tripData) {
+                    checkSections();
+                }
+            });
         });
     </script>
 </body>
